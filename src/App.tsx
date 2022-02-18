@@ -42,7 +42,8 @@ function App() {
     },
     responseType: "json",
   };
-  const host = "http://localhost:8080";
+  // const host = "http://localhost:8080";
+  const host = "https://mirrored-keyboard.herokuapp.com/";
 
   // on page load
   useEffect(() => {
