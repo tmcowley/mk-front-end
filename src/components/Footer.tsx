@@ -20,6 +20,8 @@ function Footer({ inputDelta, input, lhsEquiv, rhsEquiv, wpm, errorRate, elapsed
         <h2>Typing Metrics</h2>
         <span className="boldText">WPM: </span> {wpm.toFixed(2)} w/m
         <br />
+        <span className="boldText">Accuracy:</span> {(100 - errorRate).toFixed(2)}%
+        <br />
         <span className="boldText">Error rate:</span> {errorRate.toFixed(2)}%
         <br />
         <span className="boldText">Elapsed time:</span> {(elapsedTime / 1000).toFixed(2)} s

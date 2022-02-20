@@ -31,6 +31,8 @@ function App() {
 
   // stores text prompt
   const [prompt, setPrompt] = useState("");
+  const [promptLHS, setPromptLHS] = useState("");
+  const [promptRHS, setPromptRHS] = useState("");
 
   // metrics:
 
@@ -61,12 +63,23 @@ function App() {
   // const host = "http://localhost:8080";
   const host = "https://mirrored-keyboard.herokuapp.com/";
 
+  useEffect(() => {
+
+    // get left and right forms
+    getPromptLeftForm();
+
+    getPromptRightForm();
+    
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prompt]) 
+
   // on page load
   useEffect(() => {
     // query API active state
     queryAPIStatus();
 
     // start elapsed time
+    // alert("resetting start time")
     setStartTime(performance.now());
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -132,6 +145,10 @@ function App() {
         <p>
           {prompt === "" ? "Prompt goes here" : prompt.replaceAll(" ", "_")}
         </p>
+
+        <button type="button" onClick={(_) => copyText(prompt)}>Copy</button>
+        <button type="button" onClick={(_) => copyText(promptLHS)}>Copy LHS</button>
+        <button type="button" onClick={(_) => copyText(promptRHS)}>Copy RHS</button>
         <button type="button" onClick={(_) => skipPrompt()}>
           Skip
         </button>
@@ -159,7 +176,10 @@ function App() {
         <div id="resultsContainer" hidden={input === "" || !computed}>
           <h2>Results</h2>
           <div className="grid-container">
-            <div id="sentenceResults" className="grid-child">
+            <div id="sentenceResults" className="grid-child" 
+            // tabIndex={20} 
+              onBlur={() => {handleResultsDivBlur()}}
+            >
               <h3>Sentence-based algorithm (1)</h3>
               <ol id="results"></ol>
             </div>
@@ -183,6 +203,17 @@ function App() {
       </div>
     </body>
   );
+
+  function copyText(text: string) {
+    navigator.clipboard.writeText(text).then(() => {
+      console.log('Async: Copying to clipboard was successful!');
+    }, function(err) {
+      console.error('Async: Could not copy text: ', err);
+    });
+
+    // focus input box
+    highlightInputBox();
+  }
 
   function skipPrompt() {
     // cleanup page
@@ -236,7 +267,7 @@ function App() {
       setRhsEquiv("");
     }
 
-    // calculate rhs interpretation
+    // calculate lhs interpretation
     var path = "/get/convert/lhs";
     var url = host + path;
 
@@ -275,19 +306,71 @@ function App() {
     );
   }
 
+  function getPromptLeftForm() {
+    // calculate lhs interpretation
+    var path = "/get/convert/lhs";
+    var url = host + path;
+
+    let config: AxiosRequestConfig<string> = axiosConfig;
+    config["params"] = {
+      input: prompt,
+    };
+
+    axios.get(url, config).then(
+      (response) => {
+        // console.log(response);
+        const result = response.data;
+
+        setPromptLHS(result);
+      },
+      (error) => {
+        console.log(error);
+        queryAPIStatus();
+      }
+    );
+  }
+
+  function getPromptRightForm() {
+    // calculate rhs interpretation
+    var path = "/get/convert/rhs";
+    var url = host + path;
+
+    let config: AxiosRequestConfig<string> = axiosConfig;
+    config["params"] = {
+      input: prompt,
+    };
+
+    axios.get(url, config).then(
+      (response) => {
+        // console.log(response);
+
+        const result = response.data;
+
+        setPromptRHS(result);
+      },
+      (error) => {
+        console.log(error);
+        queryAPIStatus();
+      }
+    );
+  }
+
   function updateAllMetrics(prompt: string, correct: boolean) {
     // recalculate wpm
     {
-      const msToMins = 1 / (10 ** 3 * 60);
-
+      const msToMins = 1 / (Math.pow(10, 3) * 60);
+      
       // get number of correct words
       let elapsedTimeMins = elapsedTime * msToMins;
+      console.log("elapsed mins (not updated): " + elapsedTimeMins);
       let correctWordsCount = wpm * elapsedTimeMins;
+      console.log("correct words count: " + correctWordsCount)
 
-      elapsedTimeMins = (elapsedTime - startTime) * msToMins;
+      elapsedTimeMins = (performance.now() - startTime) * msToMins;
+      console.log("elapsed mins (updated): " + elapsedTimeMins);
 
       if (correct) {
-        correctWordsCount += prompt.length;
+        correctWordsCount += countWords(prompt);
       }
 
       console.log("Notice: setting wpm");
@@ -299,10 +382,10 @@ function App() {
       let totalWordCountLocal = totalWordCount;
       let errorCount = (errorRate / 100) * totalWordCountLocal;
 
-      totalWordCountLocal += prompt.length;
+      totalWordCountLocal += countWords(prompt);
 
       if (!correct) {
-        errorCount += prompt.length;
+        errorCount += countWords(prompt);
       }
 
       console.log("Notice: setting error rate");
@@ -310,11 +393,20 @@ function App() {
     }
 
     // recalculate totalWordCount
-    setTotalWordCount(totalWordCount + prompt.length);
+    console.log("Notice: setting totalWordCount");
+    setTotalWordCount(totalWordCount + countWords(prompt));
 
     // recalculate elapsedTime
-    setElapsedTime(elapsedTime - startTime);
+    console.log("Notice: setting elapsedTime");
+    setElapsedTime(performance.now() - startTime);
   }
+
+  // https://stackoverflow.com/a/18679657/4440865
+  function countWords(str: string) {
+    return str.split(' ')
+           .filter(function(n) { return n !== '' })
+           .length;
+}
 
   function handleElementSubmit(e: KeyboardEvent) {
     // listen for enter key
@@ -357,6 +449,16 @@ function App() {
     updateAllMetrics(prompt, false);
   }
 
+  function handleResultsDivBlur() {
+    // // when results div loses focus
+
+    // // remove colour from div
+    // decolourResultsDiv();
+
+    // // autohighlight input box
+    // highlightInputBox();
+  }
+
   function handleFormSubmit(event: React.FormEvent) {
     // prevent default form submission
     event.preventDefault();
@@ -371,6 +473,11 @@ function App() {
     let resultsDiv: HTMLDivElement = (document.getElementById(
       "sentenceResults"
     ) as HTMLDivElement)!;
+
+    // when focus is lost (aka on blur) -> decolour div
+    // resultsDiv!!.onblur(e, (e) => {
+    //   decolourResultsDiv();
+    // })
 
     // highlight first sentence in list
 
@@ -452,7 +559,7 @@ function App() {
     resultsArray.reverse();
     let results = resultsArray.map((item: string, i: number) => {
       return (
-        <li tabIndex={i + 200} id={"li" + i} key={i}>
+        <li tabIndex={i + 20} id={"li" + i} key={i}>
           {item}
         </li>
       );
@@ -507,8 +614,10 @@ function App() {
     let resultsDiv: HTMLDivElement = (document.getElementById(
       "sentenceResults"
     ) as HTMLDivElement)!;
-    resultsDiv.removeAttribute("style");
-    resultsDiv.style.background = "black";
+    // resultsDiv.removeAttribute("style");
+    resultsDiv.style.background = "white";
+    resultsDiv.style.backgroundColor = "white";
+    // resultsDiv.style.opacity = null;
   }
 
   function highlightInputBox() {
