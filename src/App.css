@@ -73,7 +73,7 @@ body {
   margin: 0.5em;
 }
 
-#apiStatsPanel {
+#footer {
   position: fixed;
   width: calc(100% - 2em);
   left: 0;
@@ -87,6 +87,10 @@ body {
   /* border: 1px solid black; */
   background-color: #fdfdff;
   box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
+
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 20px;
 }
 
 @keyframes App-logo-spin {

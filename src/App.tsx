@@ -7,7 +7,7 @@ import ReactDOM from "react-dom";
 import { useEffect } from "react";
 
 // import local components
-import DevStatsPanel from "./components/DevStatsPanel";
+import Footer from "./components/Footer";
 import Header from "./components/Header";
 
 // import logo from './logo.svg';
@@ -32,6 +32,22 @@ function App() {
   // stores text prompt
   const [prompt, setPrompt] = useState("");
 
+  // metrics:
+
+  // TODO: 
+  // stores wpm history, error rate history, elapsed times
+  // const [metricHistory, setMetricHistory] = useState({});
+
+  // elapsed time
+  const [startTime, setStartTime] = useState(0);
+  const [elapsedTime, setElapsedTime] = useState(0);
+
+  const [wpm, setWpm] = useState(0);
+
+  const [errorRate, setErrorRate] = useState(0);
+
+  const [totalWordCount, setTotalWordCount] = useState(0);
+
   // const [resultIndex, setResultIndex] = useState(null);
 
   // API & Axios config
@@ -50,11 +66,17 @@ function App() {
     // query API active state
     queryAPIStatus();
 
+    // start elapsed time
+    setStartTime(performance.now());
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // on update of input => update stats, results
   useEffect(() => {
+    // update metric: elapsed time
+    setElapsedTime(performance.now() - startTime);
+
     // calculate and render LHS and RHS interpretations
     renderEquivalents(input);
 
@@ -71,7 +93,8 @@ function App() {
       return;
     }
 
-    if (prompt === "") {
+    const emptyPrompt = (prompt === "");
+    if (emptyPrompt) {
       // if first time -> query text prompt
       populatePrompt();
     }
@@ -109,7 +132,7 @@ function App() {
         <p>
           {prompt === "" ? "Prompt goes here" : prompt.replaceAll(" ", "_")}
         </p>
-        <button type="button" onClick={(_) => populatePrompt()}>
+        <button type="button" onClick={(_) => skipPrompt()}>
           Skip
         </button>
       </div>
@@ -148,15 +171,29 @@ function App() {
           </div>
         </div>
 
-        <DevStatsPanel
+        <Footer
           inputDelta={inputDelta}
           input={input}
           lhsEquiv={lhsEquiv}
           rhsEquiv={rhsEquiv}
+          wpm={wpm}
+          errorRate={errorRate}
+          elapsedTime={elapsedTime}
         />
       </div>
     </body>
   );
+
+  function skipPrompt() {
+    // cleanup page
+    clearPage();
+
+    // populate new prompt
+    populatePrompt();
+
+    // focus input box
+    highlightInputBox();
+  }
 
   function queryAPIStatus() {
     const path = "/get/status";
@@ -205,8 +242,8 @@ function App() {
 
     let config: AxiosRequestConfig<string> = axiosConfig;
     config["params"] = {
-      input: input
-    }
+      input: input,
+    };
 
     axios.get(url, config).then(
       (response) => {
@@ -238,49 +275,86 @@ function App() {
     );
   }
 
+  function updateAllMetrics(prompt: string, correct: boolean) {
+    // recalculate wpm
+    {
+      const msToMins = 1 / (10 ** 3 * 60);
+
+      // get number of correct words
+      let elapsedTimeMins = elapsedTime * msToMins;
+      let correctWordsCount = wpm * elapsedTimeMins;
+
+      elapsedTimeMins = (elapsedTime - startTime) * msToMins;
+
+      if (correct) {
+        correctWordsCount += prompt.length;
+      }
+
+      console.log("Notice: setting wpm");
+      setWpm(correctWordsCount / elapsedTimeMins);
+    }
+
+    // recalculate error rates
+    {
+      let totalWordCountLocal = totalWordCount;
+      let errorCount = (errorRate / 100) * totalWordCountLocal;
+
+      totalWordCountLocal += prompt.length;
+
+      if (!correct) {
+        errorCount += prompt.length;
+      }
+
+      console.log("Notice: setting error rate");
+      setErrorRate((errorCount / totalWordCountLocal) * 100);
+    }
+
+    // recalculate totalWordCount
+    setTotalWordCount(totalWordCount + prompt.length);
+
+    // recalculate elapsedTime
+    setElapsedTime(elapsedTime - startTime);
+  }
+
   function handleElementSubmit(e: KeyboardEvent) {
     // listen for enter key
     if (e.key === "Enter") {
       // find current selected result
       let activeResult: HTMLLIElement = document.activeElement as HTMLLIElement;
 
-      // let resultsDiv: HTMLDivElement = (document.getElementById("sentenceResults") as HTMLDivElement)!;
-      // // get results (list elements) collection
-      // let resultsList = resultsDiv.querySelector("ol");
-      // let results: HTMLCollection = resultsList?.children!
-
-      // let activeResult: (HTMLLIElement | null) = null;
-      // for (let i = 0; i < results.length; i++) {
-      //   let result: HTMLLIElement = results[i] as HTMLLIElement;
-      //   if (result.classList.contains('focus') || result.classList.contains('active')) {
-      //     // found the active result
-      //     activeResult = result;
-      //     break;
-      //   }
-      // }
-
-      // activeResult = (document.activeElement as HTMLLIElement);
-
-      // // no results selected by user
-      // if (activeResult === null) {
-      //   alert("active is null")
-      //   return;
-      // }
-
-      // alert("tc: " + activeResult.textContent)
-
-      // alert(activeResult.textContent)
-      // alert(prompt)
-      // alert(activeResult.textContent === prompt)
-
-      if (activeResult.textContent === prompt) {
-        console.log("success");
-        populatePrompt();
+      const correctResultChosen: boolean = activeResult.textContent === prompt;
+      if (correctResultChosen) {
+        handleCorrectResult();
+      } else {
+        handleIncorrectResult();
       }
 
       // listen for numeric entry
       // ...
     }
+  }
+
+  function handleCorrectResult() {
+    console.log("CorrectResult");
+
+    // update metrics
+    updateAllMetrics(prompt, true);
+
+    // cleanup page
+    clearPage();
+
+    // populate new prompt
+    populatePrompt();
+
+    // focus input box
+    highlightInputBox();
+  }
+
+  function handleIncorrectResult() {
+    console.log("IncorrectResult");
+
+    // update metrics
+    updateAllMetrics(prompt, false);
   }
 
   function handleFormSubmit(event: React.FormEvent) {
@@ -290,11 +364,13 @@ function App() {
     // remove highlight from text input box
     unhighlightInputBox();
 
-    // highlight sentence based algorithm box
+    // colour sentence based algorithm box
+    colourResultsDiv();
+
+    // get results div
     let resultsDiv: HTMLDivElement = (document.getElementById(
       "sentenceResults"
     ) as HTMLDivElement)!;
-    resultsDiv.style.background = "lightblue";
 
     // highlight first sentence in list
 
@@ -332,6 +408,14 @@ function App() {
     // setResultIndex(0);
   }
 
+  function colourResultsDiv() {
+    // colour sentence based algorithm box
+    let resultsDiv: HTMLDivElement = (document.getElementById(
+      "sentenceResults"
+    ) as HTMLDivElement)!;
+    resultsDiv.style.background = "lightblue";
+  }
+
   function postInput(input: string) {
     if (!input || input === "") {
       setComputed(false);
@@ -345,8 +429,8 @@ function App() {
 
     let config: AxiosRequestConfig<string> = axiosConfig;
     config["params"] = {
-      input: input
-    }
+      input: input,
+    };
 
     axios.get(url, config).then(
       (response) => {
@@ -378,12 +462,7 @@ function App() {
     ReactDOM.render(results, document.getElementById("results"));
   }
 
-  function clearInputBox() {
-    (document.getElementById("input") as HTMLInputElement).value = "";
-    setInput("");
-  }
-
-  function populatePrompt() {
+  function clearPage() {
     // remove event listener from results div
     let resultsDiv: HTMLDivElement = (document.getElementById(
       "sentenceResults"
@@ -391,13 +470,19 @@ function App() {
     resultsDiv.removeEventListener("keydown", handleElementSubmit);
 
     // clear input box, reset input
-    clearInputBox()
+    clearInputBox();
 
     // remove highlighting from results div
-    unhighlightResultsDiv();
+    decolourResultsDiv();
+  }
 
-    highlightInputBox();
+  function clearInputBox() {
+    (document.getElementById("input") as HTMLInputElement).value = "";
+    setInput("");
+    setInputDelta("");
+  }
 
+  function populatePrompt() {
     // get new prompt, populate
     const path = "/get/random-phrase";
     const url = host + path;
@@ -417,12 +502,13 @@ function App() {
     );
   }
 
-  function unhighlightResultsDiv() {
+  function decolourResultsDiv() {
     // remove highlighting from results div
     let resultsDiv: HTMLDivElement = (document.getElementById(
       "sentenceResults"
     ) as HTMLDivElement)!;
-    resultsDiv.style.background = "";
+    resultsDiv.removeAttribute("style");
+    resultsDiv.style.background = "black";
   }
 
   function highlightInputBox() {
