@@ -154,3 +154,20 @@ i .copied::after {
   will-change: opacity, transform;
   animation: showcopied 1.5s ease;
 }
+
+table, th, td {
+  /* border: 1px solid black; */
+}
+
+.monospace {
+  font-family: monospace;
+}
+
+.large {
+  font-size: large;
+}
+
+.leftPadding1em {
+  /* margin-left: 1em; */
+  padding-left: 1em;
+}
