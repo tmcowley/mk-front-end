@@ -34,6 +34,8 @@ function App() {
   const [promptLHS, setPromptLHS] = useState("");
   const [promptRHS, setPromptRHS] = useState("");
 
+  const [madeCorrectGuess, setMadeCorrectGuess] = useState(false);
+
   // metrics:
 
   // TODO: 
@@ -133,6 +135,19 @@ function App() {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [apiActive]);
+
+  useEffect(() => {
+
+    if (!madeCorrectGuess) {
+      return;
+    }
+
+    handleCorrectResult();
+
+    setMadeCorrectGuess(false);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [madeCorrectGuess]);
 
   return (
     <body className="App">
@@ -416,7 +431,7 @@ function App() {
 
       const correctResultChosen: boolean = activeResult.textContent === prompt;
       if (correctResultChosen) {
-        handleCorrectResult();
+        setMadeCorrectGuess(true);
       } else {
         handleIncorrectResult();
       }
