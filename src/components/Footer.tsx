@@ -21,11 +21,9 @@ function Footer({
   elapsedTime,
 }: FooterProps) {
   return (
-    <div id="footer" className="container">
-      <div id="metrics" 
-        // className="metricsItem"
-      >
-        <h2>Typing Metrics</h2>
+    <div id="footer" className="flexbox-container">
+      <div className="flexbox-item" id="typing-metrics">
+        <h3 className="centre">Typing Metrics</h3>
 
         <table>
           <colgroup>
@@ -34,23 +32,23 @@ function Footer({
           </colgroup>
           <tbody>
             <tr>
-              <td className="boldText">Words per minute: </td>
+              <td
+              // className="boldText"
+              >
+                Words per minute:{" "}
+              </td>
               <td className="monospace large leftPadding1em">
-                {
-                
-                wpm.toFixed(2).toString().padStart(6, "0")
-                
-                } wm<sup>{-1}</sup>
+                {wpm.toFixed(2).toString().padStart(6, "0")} wm<sup>{-1}</sup>
               </td>
             </tr>
             <tr>
-              <td className="boldText">Typing accuracy: </td>
+              <td
+              // className="boldText"
+              >
+                Typing accuracy:{" "}
+              </td>
               <td className="monospace large leftPadding1em">
-                {
-                
-                (100 - errorRate).toFixed(2).toString().padStart(6, "0")
-                
-                } %
+                {(100 - errorRate).toFixed(2).toString().padStart(6, "0")} %
               </td>
             </tr>
             {/* <tr>
@@ -64,24 +62,26 @@ function Footer({
               </td>
             </tr> */}
             <tr>
-              <td className="boldText">Elapsed time: </td>
+              <td
+              // className="boldText"
+              >
+                Elapsed time:{" "}
+              </td>
               <td className="monospace large leftPadding1em">
-                {
-                
-                (elapsedTime / 1000).toFixed(2).toString().padStart(6, "0")
-                
-                } s
+                {(elapsedTime / 1000).toFixed(2).toString().padStart(6, "0")} s
               </td>
             </tr>
           </tbody>
         </table>
-
       </div>
 
-      <div id="inputStats" 
+      <div
+        // id="inputStats"
+        id="input-stats"
+        className="flexbox-item"
         // className="metricsItem"
       >
-        <h2>Input Stats</h2>
+        <h3 className="centre">Input Stats</h3>
 
         <table>
           <colgroup>
@@ -90,15 +90,27 @@ function Footer({
           </colgroup>
           <tbody>
             <tr>
-              <td className="boldText">Input: </td>
+              <td
+              // className="boldText"
+              >
+                Input:{" "}
+              </td>
               <td className="monospace large leftPadding1em">{input}</td>
             </tr>
             <tr>
-              <td className="boldText">Left form: </td>
+              <td
+              // className="boldText"
+              >
+                Left form:{" "}
+              </td>
               <td className="monospace large leftPadding1em">{lhsEquiv}</td>
             </tr>
             <tr>
-              <td className="boldText">Right form: </td>
+              <td
+              // className="boldText"
+              >
+                Right form:{" "}
+              </td>
               <td className="monospace large leftPadding1em">{rhsEquiv}</td>
             </tr>
           </tbody>

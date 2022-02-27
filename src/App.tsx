@@ -36,7 +36,7 @@ function App() {
 
   // metrics:
 
-  // TODO: 
+  // TODO:
   // stores wpm history, error rate history, elapsed times
   // const [metricHistory, setMetricHistory] = useState({});
 
@@ -64,14 +64,13 @@ function App() {
   const host = "https://mirrored-keyboard.herokuapp.com/";
 
   useEffect(() => {
-
     // get left and right forms
     getPromptLeftForm();
 
     getPromptRightForm();
-    
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [prompt]) 
+  }, [prompt]);
 
   // on page load
   useEffect(() => {
@@ -106,7 +105,7 @@ function App() {
       return;
     }
 
-    const emptyPrompt = (prompt === "");
+    const emptyPrompt = prompt === "";
     if (emptyPrompt) {
       // if first time -> query text prompt
       populatePrompt();
@@ -135,7 +134,7 @@ function App() {
   }, [apiActive]);
 
   return (
-    <body className="App">
+    <div className="App">
       <Header />
 
       <br />
@@ -146,9 +145,15 @@ function App() {
           {prompt === "" ? "Prompt goes here" : prompt.replaceAll(" ", "_")}
         </p>
 
-        <button type="button" onClick={(_) => copyText(prompt)}>Copy</button>
-        <button type="button" onClick={(_) => copyText(promptLHS)}>Copy LHS</button>
-        <button type="button" onClick={(_) => copyText(promptRHS)}>Copy RHS</button>
+        <button type="button" onClick={(_) => copyText(prompt)}>
+          Copy
+        </button>
+        <button type="button" onClick={(_) => copyText(promptLHS)}>
+          Copy LHS
+        </button>
+        <button type="button" onClick={(_) => copyText(promptRHS)}>
+          Copy RHS
+        </button>
         <button type="button" onClick={(_) => skipPrompt()}>
           Skip
         </button>
@@ -176,9 +181,13 @@ function App() {
         <div id="resultsContainer" hidden={input === "" || !computed}>
           <h2>Results</h2>
           <div className="grid-container">
-            <div id="sentenceResults" className="grid-child" 
-            // tabIndex={20} 
-              onBlur={() => {handleResultsDivBlur()}}
+            <div
+              id="sentenceResults"
+              className="grid-child"
+              // tabIndex={20}
+              onBlur={() => {
+                handleResultsDivBlur();
+              }}
             >
               <h3>Sentence-based algorithm (1)</h3>
               <ol id="results"></ol>
@@ -201,15 +210,18 @@ function App() {
           elapsedTime={elapsedTime}
         />
       </div>
-    </body>
+    </div>
   );
 
   function copyText(text: string) {
-    navigator.clipboard.writeText(text).then(() => {
-      console.log('Async: Copying to clipboard was successful!');
-    }, function(err) {
-      console.error('Async: Could not copy text: ', err);
-    });
+    navigator.clipboard.writeText(text).then(
+      () => {
+        console.log("Async: Copying to clipboard was successful!");
+      },
+      function (err) {
+        console.error("Async: Could not copy text: ", err);
+      }
+    );
 
     // focus input box
     highlightInputBox();
@@ -359,12 +371,12 @@ function App() {
     // recalculate wpm
     {
       const msToMins = 1 / (Math.pow(10, 3) * 60);
-      
+
       // get number of correct words
       let elapsedTimeMins = elapsedTime * msToMins;
       console.log("elapsed mins (not updated): " + elapsedTimeMins);
       let correctWordsCount = wpm * elapsedTimeMins;
-      console.log("correct words count: " + correctWordsCount)
+      console.log("correct words count: " + correctWordsCount);
 
       elapsedTimeMins = (performance.now() - startTime) * msToMins;
       console.log("elapsed mins (updated): " + elapsedTimeMins);
@@ -403,10 +415,10 @@ function App() {
 
   // https://stackoverflow.com/a/18679657/4440865
   function countWords(str: string) {
-    return str.split(' ')
-           .filter(function(n) { return n !== '' })
-           .length;
-}
+    return str.split(" ").filter(function (n) {
+      return n !== "";
+    }).length;
+  }
 
   function handleElementSubmit(e: KeyboardEvent) {
     // listen for enter key
@@ -428,6 +440,9 @@ function App() {
 
   function handleCorrectResult() {
     console.log("CorrectResult");
+
+    // remove focus/ select
+    (document.activeElement as HTMLLIElement).blur();
 
     // update metrics
     updateAllMetrics(prompt, true);
@@ -451,10 +466,8 @@ function App() {
 
   function handleResultsDivBlur() {
     // // when results div loses focus
-
     // // remove colour from div
     // decolourResultsDiv();
-
     // // autohighlight input box
     // highlightInputBox();
   }
@@ -620,11 +633,18 @@ function App() {
     // resultsDiv.style.opacity = null;
   }
 
+  /**
+   * focus-on and select input box
+   */
   function highlightInputBox() {
-    // focus-on and select input box
+    // alert("should be focussing")
+
     const inputElement: HTMLInputElement = document.getElementById(
       "input"
     )! as HTMLInputElement;
+    if (inputElement === null || inputElement === undefined) {
+      alert("input el is null")
+    }
     inputElement.focus();
     inputElement.select();
   }
