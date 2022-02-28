@@ -1,0 +1,197 @@
+// --------
+// OLD FUNCS
+// --------
+
+
+function OldResultsSelector() {
+
+  function handleElementSubmit(e: KeyboardEvent) {
+    // listen for enter key
+    if (e.key === "Enter") {
+      // find current selected result
+      let activeResult: HTMLLIElement = document.activeElement as HTMLLIElement;
+
+      const correctResultChosen: boolean = activeResult.textContent === prompt;
+      if (correctResultChosen) {
+        handleCorrectResult();
+      } else {
+        handleIncorrectResult();
+      }
+
+      // listen for numeric entry
+      // ...
+    }
+  }
+
+
+  function handleCorrectResult() {
+    console.log("CorrectResult");
+
+    // remove focus/ select
+    (document.activeElement as HTMLLIElement).blur();
+
+    // update metrics
+    updateAllMetrics(prompt, true);
+
+    // cleanup page
+    clearPage();
+
+    // populate new prompt
+    populatePrompt();
+
+    // focus input box
+    selectInputBox();
+  }
+
+  function handleIncorrectResult() {
+    console.log("IncorrectResult");
+
+    // update metrics
+    updateAllMetrics(prompt, false);
+  }
+
+  /**
+   * when results div loses focus
+   */
+  function handleResultsDivBlur(event: React.FocusEvent) {
+    event.preventDefault();
+    console.log("results div blurred")
+
+    // remove colour from div
+    decolourResultsDiv();
+
+    // autohighlight input box
+    selectInputBox();
+  }
+
+  function decolourResultsDiv() {
+    // remove highlighting from results div
+    let resultsDiv: HTMLDivElement = (document.getElementById(
+      "sentenceResults"
+    ) as HTMLDivElement)!;
+    // resultsDiv.removeAttribute("style");
+    resultsDiv.style.background = "";
+    resultsDiv.style.backgroundColor = "";
+    // resultsDiv.style.opacity = null;
+  }
+
+  function clearPage() {
+    // remove event listener from results div
+    let resultsDiv: HTMLDivElement = (document.getElementById(
+      "sentenceResults"
+    ) as HTMLDivElement)!;
+    resultsDiv.removeEventListener("keydown", handleElementSubmit);
+
+    // clear and reset input
+    clearInput();
+
+    // remove highlighting from results div
+    decolourResultsDiv();
+  }
+
+  function handleFormSubmitOld(event: React.FormEvent) {
+    // prevent default form submission
+    event.preventDefault();
+
+    // // remove highlight from text input box
+    // blurInputBox();
+
+    // colour sentence based algorithm box
+    colourResultsDiv();
+
+    // get results div
+    let resultsDiv: HTMLDivElement = (document.getElementById(
+      "sentenceResults"
+    ) as HTMLDivElement)!;
+
+    // when focus is lost (aka on blur) -> decolour div
+    // resultsDiv!!.onblur(e, (e) => {
+    //   decolourResultsDiv();
+    // })
+
+    // highlight first sentence in list
+
+    // get results (list elements) collection
+    let resultsList = resultsDiv.querySelector("ol");
+    let results: HTMLCollection = resultsList?.children!;
+
+    // ensure there are results
+    const noResults: boolean = results.length === 0;
+    if (noResults) {
+      // do nothing
+
+      // re-highlight input box
+      selectInputBox();
+
+      return;
+    }
+
+    // add event (keydown) listener to parent div
+    // resultsDiv.addEventListener("keydown", (e) => handleElementSubmit(e));
+    resultsDiv.addEventListener("keydown", handleElementSubmit);
+
+    // listen for numeric entry
+    // ...
+
+    // highlight the first result
+    const firstListEl: HTMLLIElement = results[0] as HTMLLIElement;
+    firstListEl.focus();
+
+    // for (let i = 0; i < results.length; i++) {
+    //   let result = results[i].textContent;
+    //   console.log(result)
+    // }
+
+    // setResultIndex(0);
+  }
+
+  return (
+    <div id= "resultsContainer" hidden = { input === "" || !computed
+}>
+  <h2>Results < /h2>
+  < div className = "grid-container" >
+    <div
+            id="sentenceResults"
+className = "grid-child"
+// tabIndex={20}
+onBlur = {(e) => {
+  handleResultsDivBlur(e);
+}}
+          >
+  <h3>Sentence - based algorithm(1) < /h3>
+    < ol id = "results" > { resultsAsTable } < /ol>
+      < /div>
+
+      < div className = "grid-child" >
+        <h3>Real - time algorithm(2) < /h3>
+            ...
+</div>
+  < /div>
+  < /div>
+    );
+  }
+
+function colourResultsDiv() {
+  // colour sentence based algorithm box
+  let resultsDiv: HTMLDivElement = (document.getElementById(
+    "sentenceResults"
+  ) as HTMLDivElement)!;
+  resultsDiv.style.background = "lightblue";
+}
+
+function storeResults(response: AxiosResponse) {
+  // generate the results list
+  const resultsArray = response.data;
+  resultsArray.reverse();
+
+  let resultsAsTable = resultsArray.map((item: string, i: number) => {
+    return (
+      <li tabIndex={i + 20} id={"li" + i} key={i}>
+        {item}
+      </li>
+    );
+  });
+
+  setResults(resultsArray);
+  setResultsAsTable(resultsAsTable);
+}

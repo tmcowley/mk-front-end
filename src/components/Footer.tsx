@@ -1,5 +1,3 @@
-// DevStatsPanel
-
 type FooterProps = {
   inputDelta: string;
   input: string;

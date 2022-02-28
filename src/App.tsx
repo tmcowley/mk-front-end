@@ -1,14 +1,35 @@
-import { useState } from "react";
+import React, { useState } from "react";
 
-import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
-
-import ReactDOM from "react-dom";
+// for ReactDOM.render(), e.g. ReactDOM.render(results, document.getElementById("results"));
+// import ReactDOM from "react-dom";
 
 import { useEffect } from "react";
+
+import axios, {
+  AxiosRequestConfig,
+  // AxiosResponse
+} from "axios";
 
 // import local components
 import Footer from "./components/Footer";
 import Header from "./components/Header";
+import Prompt from "./components/Prompt";
+import TextInput from "./components/TextInput";
+import SentenceSelector from "./components/SentenceSelector";
+
+// see: https://www.npmjs.com/package/react-simple-wheel-picker
+import WheelPicker, {
+  PickerData,
+  // WheelPickerRef,
+} from "react-simple-wheel-picker";
+
+import {
+  getStringDelta,
+  countWords,
+  selectInputBox,
+  clearInput,
+} from "./utils/methods";
+// import { queryAPIStatus, renderEquivalents, getPromptLeftForm, getPromptRightForm, postInput, populatePrompt} from "./utils/api-calls";
 
 // import logo from './logo.svg';
 
@@ -26,6 +47,13 @@ function App() {
   // stores computed success state
   const [computed, setComputed] = useState(false);
 
+  // stores sentence results
+  const [results, setResults] = useState<string[] | undefined>();
+
+  // const [target, setTarget] = useState<PickerData | undefined>();
+  const [targetId, setTargetId] = useState<number | undefined>();
+  const [targetValue, setTargetValue] = useState<string | undefined>();
+
   // stores API active state
   const [apiActive, setApiActive] = useState(false);
 
@@ -33,8 +61,6 @@ function App() {
   const [prompt, setPrompt] = useState("");
   const [promptLHS, setPromptLHS] = useState("");
   const [promptRHS, setPromptRHS] = useState("");
-
-  const [madeCorrectGuess, setMadeCorrectGuess] = useState(false);
 
   // metrics:
 
@@ -63,7 +89,7 @@ function App() {
     responseType: "json",
   };
   // const host = "http://localhost:8080";
-  const host = "https://mirrored-keyboard.herokuapp.com/";
+  const host = "https://mirrored-keyboard.herokuapp.com";
 
   useEffect(() => {
     // get left and right forms
@@ -86,6 +112,13 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // // test
+  // useEffect(() => {
+  //   console.log("useEffect() - target changed");
+
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [target]);
+
   // on update of input => update stats, results
   useEffect(() => {
     // update metric: elapsed time
@@ -96,6 +129,8 @@ function App() {
 
     // launch post request to get matching sentences
     postInput(input);
+
+    selectInputBox();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [input]);
@@ -114,7 +149,7 @@ function App() {
     }
 
     // focus-on and select input box
-    highlightInputBox();
+    selectInputBox();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [apiActive]);
@@ -135,123 +170,215 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [apiActive]);
 
-  useEffect(() => {
-
-    if (!madeCorrectGuess) {
-      return;
-    }
-
-    handleCorrectResult();
-
-    setMadeCorrectGuess(false);
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [madeCorrectGuess]);
+  let target: PickerData | undefined;
 
   return (
     <div className="App">
       <Header />
 
-      <br />
-      <hr />
-
-      <div id="promptText">
-        <p>
-          {prompt === "" ? "Prompt goes here" : prompt.replaceAll(" ", "_")}
-        </p>
-
-        <button type="button" onClick={(_) => copyText(prompt)}>
-          Copy
-        </button>
-        <button type="button" onClick={(_) => copyText(promptLHS)}>
-          Copy LHS
-        </button>
-        <button type="button" onClick={(_) => copyText(promptRHS)}>
-          Copy RHS
-        </button>
-        <button type="button" onClick={(_) => skipPrompt()}>
-          Skip
-        </button>
-      </div>
-
       <hr />
 
       <div id="content">
-        <form onSubmit={(e) => handleFormSubmit(e)} autoComplete="off">
-          <label>
-            <input
-              id="input"
-              type="text"
-              value={input}
-              onInput={(e) => handleOnInput(e)}
-              onFocus={(_) => queryAPIStatus()}
-              disabled={!apiActive}
-            />
-          </label>
-        </form>
+        {/* Sentence prompt */}
+        <Prompt
+          prompt={prompt}
+          promptLHS={promptLHS}
+          promptRHS={promptRHS}
+          populatePrompt={populatePrompt}
+        />
 
-        <br />
         <hr />
 
-        <div id="resultsContainer" hidden={input === "" || !computed}>
-          <h2>Results</h2>
-          <div className="grid-container">
-            <div
-              id="sentenceResults"
-              className="grid-child"
-              // tabIndex={20}
-              onBlur={() => {
-                handleResultsDivBlur();
-              }}
-            >
-              <h3>Sentence-based algorithm (1)</h3>
-              <ol id="results"></ol>
-            </div>
-
-            <div className="grid-child">
-              <h3>Real-time algorithm (2)</h3>
-              ...
-            </div>
-          </div>
-        </div>
-
-        <Footer
-          inputDelta={inputDelta}
+        {/* Text input area (form) */}
+        <TextInput
           input={input}
-          lhsEquiv={lhsEquiv}
-          rhsEquiv={rhsEquiv}
-          wpm={wpm}
-          errorRate={errorRate}
-          elapsedTime={elapsedTime}
+          apiActive={apiActive}
+          handleOnInput={handleOnInput}
+          queryAPIStatus={queryAPIStatus}
+          addKeydownListener={addKeydownListener}
         />
+
+        <hr />
+
+        {/* Sentence wheel selector */}
+        <SentenceSelector 
+          results={results} 
+          computed={computed} 
+          onChange={(targetArg) => {
+            // edit top-level variable target
+            // note: all attempts to change state failed
+            console.log("sentence selector change"); 
+            console.log(targetArg);
+            target = {
+              id: targetArg.id,
+              value: (targetArg.value as string).slice(4)
+            }
+            addKeydownListener()
+            console.log("target is undefined: " + target === undefined)
+          }} 
+        />
+
+        {/* {OldResultsSelector()} */}
       </div>
+
+      <Footer
+        inputDelta={inputDelta}
+        input={input}
+        lhsEquiv={lhsEquiv}
+        rhsEquiv={rhsEquiv}
+        wpm={wpm}
+        errorRate={errorRate}
+        elapsedTime={elapsedTime}
+      />
     </div>
   );
 
-  function copyText(text: string) {
-    navigator.clipboard.writeText(text).then(
-      () => {
-        console.log("Async: Copying to clipboard was successful!");
-      },
-      function (err) {
-        console.error("Async: Could not copy text: ", err);
+  function handleOnInput(event: React.FormEvent<HTMLInputElement>) {
+    queryAPIStatus();
+
+    const oldValue = input;
+    const inputElement = event.target as HTMLInputElement;
+    const newValue = inputElement.value;
+    const selectionEnd = inputElement.selectionEnd!;
+
+    // update the state-stored input
+    setInput(newValue);
+
+    // calculate the input delta (new characters)
+    const inputDelta = getStringDelta(oldValue, newValue, selectionEnd);
+    setInputDelta(inputDelta);
+  }
+
+  function addKeydownListener() {
+    removeKeydownListener();
+    (
+      document.getElementById("wheelPicker") as HTMLUListElement
+    )?.addEventListener("keydown", handleKeydown);
+  }
+
+  function removeKeydownListener() {
+    (
+      document.getElementById("wheelPicker") as HTMLUListElement
+    )?.removeEventListener("keydown", handleKeydown);
+  }
+
+  function handleKeydown(e: KeyboardEvent) {
+    // listen for enter key
+    if (e.key === "Enter") {
+      console.log("enter detected");
+
+      // check if chosen sentence matches prompt
+      const correctChoice = (target?.value as string) === prompt;
+      if (correctChoice) {
+        console.log("correct choice");
+        handleCorrectChoice();
+      } else {
+        console.log("wrong choice");
+        console.log(target?.value as string)
+        console.log(prompt)
+        handleIncorrectChoice();
       }
-    );
+    }
 
-    // focus input box
-    highlightInputBox();
+    // listen for numeric entry
+    // ...
+    switch (e.key) {
+      case "1":
+        console.log("1");
+        break;
+      case "2":
+        console.log("2");
+        break;
+      case "3":
+        console.log("3");
+        break;
+      case "4":
+        console.log("4");
+        break;
+      case "5":
+        console.log("5");
+    }
+
+    function handleCorrectChoice() {
+      console.log("correct choice");
+
+      // remove focus/ select
+      (document.activeElement as HTMLLIElement).blur();
+
+      // update metrics
+      updateAllMetrics(prompt, true);
+
+      // clear page
+      clearInput(setInput, setInputDelta);
+
+      // populate new prompt
+      populatePrompt();
+
+      // focus input box
+      selectInputBox();
+
+      target = undefined;
+
+      removeKeydownListener();
+    }
+
+    function handleIncorrectChoice() {
+      // update metrics
+      updateAllMetrics(prompt, false);
+
+      target = undefined;
+    }
   }
 
-  function skipPrompt() {
-    // cleanup page
-    clearPage();
+  function updateAllMetrics(prompt: string, correct: boolean) {
+    // recalculate wpm
+    {
+      const msToMins = 1 / (Math.pow(10, 3) * 60);
 
-    // populate new prompt
-    populatePrompt();
+      // get number of correct words
+      let elapsedTimeMins = elapsedTime * msToMins;
+      console.log("elapsed mins (not updated): " + elapsedTimeMins);
+      let correctWordsCount = wpm * elapsedTimeMins;
+      console.log("correct words count: " + correctWordsCount);
 
-    // focus input box
-    highlightInputBox();
+      elapsedTimeMins = (performance.now() - startTime) * msToMins;
+      console.log("elapsed mins (updated): " + elapsedTimeMins);
+
+      if (correct) {
+        correctWordsCount += countWords(prompt);
+      }
+
+      console.log("Notice: setting wpm");
+      setWpm(correctWordsCount / elapsedTimeMins);
+    }
+
+    // recalculate error rates
+    {
+      let totalWordCountLocal = totalWordCount;
+      let errorCount = (errorRate / 100) * totalWordCountLocal;
+
+      totalWordCountLocal += countWords(prompt);
+
+      if (!correct) {
+        errorCount += countWords(prompt);
+      }
+
+      console.log("Notice: setting error rate");
+      setErrorRate((errorCount / totalWordCountLocal) * 100);
+    }
+
+    // recalculate totalWordCount
+    console.log("Notice: setting totalWordCount");
+    setTotalWordCount(totalWordCount + countWords(prompt));
+
+    // recalculate elapsedTime
+    console.log("Notice: setting elapsedTime");
+    setElapsedTime(performance.now() - startTime);
   }
+
+  // -----
+  // API calls
+  // -----
 
   function queryAPIStatus() {
     const path = "/get/status";
@@ -270,22 +397,6 @@ function App() {
         setApiActive(false);
       }
     );
-  }
-
-  function handleOnInput(event: React.FormEvent<HTMLInputElement>) {
-    queryAPIStatus();
-
-    const oldValue = input;
-    const inputElement = event.target as HTMLInputElement;
-    const newValue = inputElement.value;
-    const selectionEnd = inputElement.selectionEnd!;
-
-    // update the state-stored input
-    setInput(newValue);
-
-    // calculate the input delta (new characters)
-    const inputDelta = getStringDelta(oldValue, newValue, selectionEnd);
-    setInputDelta(inputDelta);
   }
 
   function renderEquivalents(input: string) {
@@ -382,175 +493,6 @@ function App() {
     );
   }
 
-  function updateAllMetrics(prompt: string, correct: boolean) {
-    // recalculate wpm
-    {
-      const msToMins = 1 / (Math.pow(10, 3) * 60);
-
-      // get number of correct words
-      let elapsedTimeMins = elapsedTime * msToMins;
-      console.log("elapsed mins (not updated): " + elapsedTimeMins);
-      let correctWordsCount = wpm * elapsedTimeMins;
-      console.log("correct words count: " + correctWordsCount);
-
-      elapsedTimeMins = (performance.now() - startTime) * msToMins;
-      console.log("elapsed mins (updated): " + elapsedTimeMins);
-
-      if (correct) {
-        correctWordsCount += countWords(prompt);
-      }
-
-      console.log("Notice: setting wpm");
-      setWpm(correctWordsCount / elapsedTimeMins);
-    }
-
-    // recalculate error rates
-    {
-      let totalWordCountLocal = totalWordCount;
-      let errorCount = (errorRate / 100) * totalWordCountLocal;
-
-      totalWordCountLocal += countWords(prompt);
-
-      if (!correct) {
-        errorCount += countWords(prompt);
-      }
-
-      console.log("Notice: setting error rate");
-      setErrorRate((errorCount / totalWordCountLocal) * 100);
-    }
-
-    // recalculate totalWordCount
-    console.log("Notice: setting totalWordCount");
-    setTotalWordCount(totalWordCount + countWords(prompt));
-
-    // recalculate elapsedTime
-    console.log("Notice: setting elapsedTime");
-    setElapsedTime(performance.now() - startTime);
-  }
-
-  // https://stackoverflow.com/a/18679657/4440865
-  function countWords(str: string) {
-    return str.split(" ").filter(function (n) {
-      return n !== "";
-    }).length;
-  }
-
-  function handleElementSubmit(e: KeyboardEvent) {
-    // listen for enter key
-    if (e.key === "Enter") {
-      // find current selected result
-      let activeResult: HTMLLIElement = document.activeElement as HTMLLIElement;
-
-      const correctResultChosen: boolean = activeResult.textContent === prompt;
-      if (correctResultChosen) {
-        setMadeCorrectGuess(true);
-      } else {
-        handleIncorrectResult();
-      }
-
-      // listen for numeric entry
-      // ...
-    }
-  }
-
-  function handleCorrectResult() {
-    console.log("CorrectResult");
-
-    // remove focus/ select
-    (document.activeElement as HTMLLIElement).blur();
-
-    // update metrics
-    updateAllMetrics(prompt, true);
-
-    // cleanup page
-    clearPage();
-
-    // populate new prompt
-    populatePrompt();
-
-    // focus input box
-    highlightInputBox();
-  }
-
-  function handleIncorrectResult() {
-    console.log("IncorrectResult");
-
-    // update metrics
-    updateAllMetrics(prompt, false);
-  }
-
-  function handleResultsDivBlur() {
-    // // when results div loses focus
-    // // remove colour from div
-    // decolourResultsDiv();
-    // // autohighlight input box
-    // highlightInputBox();
-  }
-
-  function handleFormSubmit(event: React.FormEvent) {
-    // prevent default form submission
-    event.preventDefault();
-
-    // remove highlight from text input box
-    unhighlightInputBox();
-
-    // colour sentence based algorithm box
-    colourResultsDiv();
-
-    // get results div
-    let resultsDiv: HTMLDivElement = (document.getElementById(
-      "sentenceResults"
-    ) as HTMLDivElement)!;
-
-    // when focus is lost (aka on blur) -> decolour div
-    // resultsDiv!!.onblur(e, (e) => {
-    //   decolourResultsDiv();
-    // })
-
-    // highlight first sentence in list
-
-    // get results (list elements) collection
-    let resultsList = resultsDiv.querySelector("ol");
-    let results: HTMLCollection = resultsList?.children!;
-
-    // ensure there are results
-    const noResults: boolean = results.length === 0;
-    if (noResults) {
-      // do nothing
-
-      // re-highlight input box
-      highlightInputBox();
-
-      return;
-    }
-
-    // add event (keydown) listener to parent div
-    // resultsDiv.addEventListener("keydown", (e) => handleElementSubmit(e));
-    resultsDiv.addEventListener("keydown", handleElementSubmit);
-
-    // listen for numeric entry
-    // ...
-
-    // highlight the first result
-    const firstListEl: HTMLLIElement = results[0] as HTMLLIElement;
-    firstListEl.focus();
-
-    // for (let i = 0; i < results.length; i++) {
-    //   let result = results[i].textContent;
-    //   console.log(result)
-    // }
-
-    // setResultIndex(0);
-  }
-
-  function colourResultsDiv() {
-    // colour sentence based algorithm box
-    let resultsDiv: HTMLDivElement = (document.getElementById(
-      "sentenceResults"
-    ) as HTMLDivElement)!;
-    resultsDiv.style.background = "lightblue";
-  }
-
   function postInput(input: string) {
     if (!input || input === "") {
       setComputed(false);
@@ -560,8 +502,6 @@ function App() {
     const path = "/get/submit";
     const url = host + path;
 
-    // const data = input;
-
     let config: AxiosRequestConfig<string> = axiosConfig;
     config["params"] = {
       input: input,
@@ -569,54 +509,21 @@ function App() {
 
     axios.get(url, config).then(
       (response) => {
-        // render results from response
-        renderResults(response);
+        // generate the results array
+        const resultsArray = response.data;
+        resultsArray.reverse();
+        setResults(resultsArray);
+
         setComputed(true);
       },
       (error) => {
         console.log(error);
         setComputed(false);
+        setResults(undefined);
         queryAPIStatus();
       }
     );
   }
-
-  function renderResults(response: AxiosResponse) {
-    // generate the results list
-    const resultsArray = response.data;
-    resultsArray.reverse();
-    let results = resultsArray.map((item: string, i: number) => {
-      return (
-        <li tabIndex={i + 20} id={"li" + i} key={i}>
-          {item}
-        </li>
-      );
-    });
-
-    // render the results list
-    ReactDOM.render(results, document.getElementById("results"));
-  }
-
-  function clearPage() {
-    // remove event listener from results div
-    let resultsDiv: HTMLDivElement = (document.getElementById(
-      "sentenceResults"
-    ) as HTMLDivElement)!;
-    resultsDiv.removeEventListener("keydown", handleElementSubmit);
-
-    // clear input box, reset input
-    clearInputBox();
-
-    // remove highlighting from results div
-    decolourResultsDiv();
-  }
-
-  function clearInputBox() {
-    (document.getElementById("input") as HTMLInputElement).value = "";
-    setInput("");
-    setInputDelta("");
-  }
-
   function populatePrompt() {
     // get new prompt, populate
     const path = "/get/random-phrase";
@@ -635,66 +542,6 @@ function App() {
         queryAPIStatus();
       }
     );
-  }
-
-  function decolourResultsDiv() {
-    // remove highlighting from results div
-    let resultsDiv: HTMLDivElement = (document.getElementById(
-      "sentenceResults"
-    ) as HTMLDivElement)!;
-    // resultsDiv.removeAttribute("style");
-    resultsDiv.style.background = "white";
-    resultsDiv.style.backgroundColor = "white";
-    // resultsDiv.style.opacity = null;
-  }
-
-  /**
-   * focus-on and select input box
-   */
-  function highlightInputBox() {
-    // alert("should be focussing")
-
-    const inputElement: HTMLInputElement = document.getElementById(
-      "input"
-    )! as HTMLInputElement;
-    if (inputElement === null || inputElement === undefined) {
-      alert("input el is null")
-    }
-    inputElement.focus();
-    inputElement.select();
-  }
-
-  function unhighlightInputBox() {
-    // focus-on and select input box
-    const inputElement: HTMLInputElement = document.getElementById(
-      "input"
-    )! as HTMLInputElement;
-    inputElement.blur();
-  }
-
-  // Developed with help from https://stackoverflow.com/a/34217353
-  function getStringDelta(
-    oldString: string,
-    newString: string,
-    selEnd: number
-  ) {
-    const textLost: boolean = newString.length < oldString.length;
-    if (textLost) {
-      console.log("Notice: User has removed or cut character(s)");
-      return "";
-    }
-
-    const deltaSize: number = newString.length - oldString.length;
-    const selStart: number = selEnd - deltaSize;
-
-    const isAppend: boolean = newString.substring(0, selStart) === oldString;
-
-    if (isAppend) {
-      return newString.substring(selStart, selEnd);
-    } else {
-      console.log("Notice: User has overwritten content");
-      return "";
-    }
   }
 }
 

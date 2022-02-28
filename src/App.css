@@ -13,6 +13,7 @@ body {
 #content {
   padding: 10px;
   margin: 10px;
+  min-height: 600px;
 }
 
 .App {
@@ -189,7 +190,7 @@ td {
 }
 
 .monospace {
-  font-family: monospace;
+  font-family: monospace !important;
 }
 
 .large {
@@ -200,7 +201,29 @@ td {
   text-align: center;
 }
 
+.borderless {
+  box-shadow: none !important;
+}
+
 .leftPadding1em {
   /* margin-left: 1em; */
   padding-left: 1em;
 }
+
+#sentenceSelector {
+  border: none !important;
+  /* border-radius: 15px !important; */
+  /* background-color: black !important; */
+  
+}
+
+#wheelPicker {
+  width: auto !important;
+  min-width: 400px;
+  border-radius: 15px !important;
+}
+
+/* below doesn't work */
+/* #wheelPicker.li::selection {
+  background-color: black;
+} */
