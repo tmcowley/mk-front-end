@@ -18,10 +18,7 @@ import TextInput from "./components/TextInput";
 import SentenceSelector from "./components/SentenceSelector";
 
 // see: https://www.npmjs.com/package/react-simple-wheel-picker
-import WheelPicker, {
-  PickerData,
-  // WheelPickerRef,
-} from "react-simple-wheel-picker";
+import { PickerData } from "react-simple-wheel-picker";
 
 import {
   getStringDelta,
@@ -51,8 +48,8 @@ function App() {
   const [results, setResults] = useState<string[] | undefined>();
 
   // const [target, setTarget] = useState<PickerData | undefined>();
-  const [targetId, setTargetId] = useState<number | undefined>();
-  const [targetValue, setTargetValue] = useState<string | undefined>();
+  // const [targetId, setTargetId] = useState<number | undefined>();
+  // const [targetValue, setTargetValue] = useState<string | undefined>();
 
   // stores API active state
   const [apiActive, setApiActive] = useState(false);
