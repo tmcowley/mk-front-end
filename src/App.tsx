@@ -91,7 +91,6 @@ function App() {
   useEffect(() => {
     // get left and right forms
     getPromptLeftForm();
-
     getPromptRightForm();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -109,13 +108,6 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // // test
-  // useEffect(() => {
-  //   console.log("useEffect() - target changed");
-
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [target]);
-
   // on update of input => update stats, results
   useEffect(() => {
     // update metric: elapsed time
@@ -127,10 +119,9 @@ function App() {
     // launch post request to get matching sentences
     postInput(input);
 
-    selectInputBox();
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [input]);
+
 
   // when the API becomes active
   useEffect(() => {
@@ -202,16 +193,13 @@ function App() {
           results={results} 
           computed={computed} 
           onChange={(targetArg) => {
-            // edit top-level variable target
+            // edit top-level variable: target
             // note: all attempts to change state failed
-            console.log("sentence selector change"); 
-            console.log(targetArg);
             target = {
               id: targetArg.id,
               value: (targetArg.value as string).slice(4)
             }
             addKeydownListener()
-            console.log("target is undefined: " + target === undefined)
           }} 
         />
 
@@ -260,6 +248,9 @@ function App() {
   }
 
   function handleKeydown(e: KeyboardEvent) {
+
+    e.preventDefault();
+
     // listen for enter key
     if (e.key === "Enter") {
       console.log("enter detected");
@@ -271,8 +262,6 @@ function App() {
         handleCorrectChoice();
       } else {
         console.log("wrong choice");
-        console.log(target?.value as string)
-        console.log(prompt)
         handleIncorrectChoice();
       }
     }
@@ -532,6 +521,8 @@ function App() {
         let prompt: string = response.data;
         prompt = prompt.toLowerCase();
         setPrompt(prompt);
+
+        selectInputBox();
       },
       (error) => {
         console.log("Error");

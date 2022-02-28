@@ -61,7 +61,7 @@ export function selectInputBox() {
     }
     inputElement.select();
 
-    // inputElement.focus();
+    inputElement.focus();
 }
 
 export function clearInput(setInput: Function, setInputDelta: Function) {
