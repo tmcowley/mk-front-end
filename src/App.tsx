@@ -76,6 +76,8 @@ function App() {
 
   const [totalWordCount, setTotalWordCount] = useState(0);
 
+  const [notificationEnabled, setNotificationEnabled] = useState(true)
+
   // const [resultIndex, setResultIndex] = useState(null);
 
   // API & Axios config
@@ -130,9 +132,7 @@ function App() {
   // when the API becomes active
   useEffect(() => {
     // block inactive api state
-    if (!apiActive) {
-      return;
-    }
+    if (!apiActive) return;
 
     const emptyPrompt = prompt === "";
     if (emptyPrompt) {
@@ -149,9 +149,7 @@ function App() {
   // when the API becomes inactive
   useEffect(() => {
     // block active api state
-    if (apiActive) {
-      return;
-    }
+    if (apiActive) return;
 
     // clear input, results, prompt
     cleanPage()
@@ -165,25 +163,23 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [apiActive]);
 
-  let target: PickerData | undefined;
+  let target: (PickerData | undefined);
 
-  const inactiveApiNotification = (
-    <div id='inactiveNotification'>
-      Our back-end services are currently inactive
-      <br />
-      Apologies for any inconvenience
+  const inactiveApiNotification = (hidden: boolean) => (
+    <div id='inactiveNotification' hidden={hidden}>
+      Back-end services are inactive - apologies for any inconvenience
     </div>
   );
 
   return (
     <div className="App">
 
+      {/* inactive API notification */}
+      {inactiveApiNotification(apiActive || !notificationEnabled)}
+
       <Header />
 
-      {/* inactive API notification */}
-      {apiActive ? "" : inactiveApiNotification}
-
-      <hr />
+      {/* <hr /> */}
 
       <div id="content">
 
@@ -195,7 +191,8 @@ function App() {
           populatePrompt={populatePrompt}
         />
 
-        <hr />
+        {/* <hr /> */}
+        <br />
 
         {/* Text input area (form) */}
         <TextInput
@@ -209,7 +206,7 @@ function App() {
           addKeydownListener={addKeydownListener}
         />
 
-        <hr />
+        {/* <hr /> */}
 
         {/* Sentence wheel selector */}
         <SentenceSelector
@@ -413,6 +410,8 @@ function App() {
         setApiActive(false);
       }
     );
+
+    setNotificationEnabled(true);
   }
 
   function renderEquivalents(input: string) {

@@ -32,16 +32,23 @@ body {
 }
 
 .App-header {
-  padding: 5px 0px 5px 0px;
+  padding-top: 1px;
+  padding-bottom: 1px;
+
   margin-left: 10px;
   margin-right: 10px;
   margin-bottom: 10px;
+
+  height: fit-content;
+
   text-align: center;
   background: #1abc9c;
   color: white;
   font-size: 30px;
   font-weight: bold;
   border-radius: 0px 0px 15px 15px;
+
+  box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
 }
 
 .App-link {
@@ -244,6 +251,7 @@ td {
 
   padding: 1em;
   /* margin: 1em; */
+  margin-bottom: 10px;
 
   font-weight: bold;
 
