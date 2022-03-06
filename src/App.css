@@ -227,3 +227,7 @@ td {
 /* #wheelPicker.li::selection {
   background-color: black;
 } */
+
+.bottomBorder {
+  border: 1px solid black;
+}

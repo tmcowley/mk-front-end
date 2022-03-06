@@ -1,22 +1,29 @@
-import {blurInputBox} from "../utils/methods";
+import React from "react";
+import { blurInputBox } from "../utils/methods";
 
 type TextInputProps = {
-    input: string
-    apiActive: boolean
-    handleOnInput: Function
-    queryAPIStatus: Function
-    addKeydownListener: Function
-}
+  input: string;
+  apiActive: boolean;
+  sentenceSelectorHidden: boolean;
+  handleOnInput: Function;
+  queryAPIStatus: Function;
+  addKeydownListener: Function;
+};
 
 function TextInput({
-    input,
-    apiActive,
-    handleOnInput, 
-    queryAPIStatus, 
-    addKeydownListener
+  input,
+  apiActive,
+  sentenceSelectorHidden,
+  handleOnInput,
+  queryAPIStatus,
+  addKeydownListener,
 }: TextInputProps) {
   return (
-    <form onSubmit={(e) => handleFormSubmit(e)} autoComplete="off">
+    <form
+      onSubmit={(e) => handleFormSubmit(e)}
+      onKeyDown={(e) => handleKeyDown(e)}
+      autoComplete="off"
+    >
       <label>
         <input
           id="input"
@@ -33,6 +40,24 @@ function TextInput({
   function handleFormSubmit(event: React.FormEvent) {
     // prevent default form submission
     event.preventDefault();
+
+    moveToSentenceSelector();
+  }
+
+  function handleKeyDown(event: React.KeyboardEvent) {
+    // console.log("key: {event.key}")
+
+    // listen for results selection
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+
+      moveToSentenceSelector();
+    }
+  }
+
+  function moveToSentenceSelector() {
+    // if no results found, don't move
+    if (sentenceSelectorHidden) return;
 
     // remove highlight from text input box
     blurInputBox();

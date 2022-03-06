@@ -12,18 +12,16 @@ import WheelPicker, {
 
 type SentenceSelectorProps = {
   results: string[] | undefined;
-  computed: boolean;
+  hidden: boolean;
   onChange: (target: PickerData) => void;
 };
 
 function SentenceSelector({
   results,
-  computed,
+  hidden,
   onChange,
 }: SentenceSelectorProps) {
-  if (results === [] || !results || results.length === 0 || !computed) {
-    return <></>;
-  }
+  if (hidden || !results) return <></>;
 
   // convert results array to picker data
   const data: Array<PickerData> = [];

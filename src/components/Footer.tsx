@@ -1,20 +1,24 @@
 type FooterProps = {
+  prompt: string;
   inputDelta: string;
   input: string;
   lhsEquiv: string;
   rhsEquiv: string;
 
   wpm: number;
+  wpmTrue: number;
   errorRate: number;
   elapsedTime: number;
 };
 
 function Footer({
+  prompt,
   inputDelta,
   input,
   lhsEquiv,
   rhsEquiv,
   wpm,
+  wpmTrue,
   errorRate,
   elapsedTime,
 }: FooterProps) {
@@ -33,40 +37,47 @@ function Footer({
               <td
               // className="boldText"
               >
-                Words per minute:{" "}
+                Elapsed time:{" "}
               </td>
               <td className="monospace large leftPadding1em">
-                {wpm.toFixed(2).toString().padStart(6, "0")} wm<sup>{-1}</sup>
+                {(elapsedTime / 1000).toFixed(2).toString().padStart(6, "0")} s
               </td>
             </tr>
+
+            {/* <hr /> */}
+
             <tr>
               <td
               // className="boldText"
               >
-                Typing accuracy:{" "}
+                Accuracy:{" "}
               </td>
               <td className="monospace large leftPadding1em">
                 {(100 - errorRate).toFixed(2).toString().padStart(6, "0")} %
               </td>
             </tr>
-            {/* <tr>
-              <td className="boldText">Typing error rate: </td>
-              <td className="monospace large leftPadding1em">
-                {
-                
-                errorRate.toFixed(2).toString().padStart(6, "0")
-                
-                } %
-              </td>
-            </tr> */}
+
             <tr>
               <td
               // className="boldText"
               >
-                Elapsed time:{" "}
+                Speed (typing):{" "}
               </td>
               <td className="monospace large leftPadding1em">
-                {(elapsedTime / 1000).toFixed(2).toString().padStart(6, "0")} s
+                {wpm.toFixed(2).toString().padStart(6, "0")} wm
+                <sup>{-1}</sup>
+              </td>
+            </tr>
+
+            <tr>
+              <td
+              // className="boldText"
+              >
+                Speed (full):{" "}
+              </td>
+              <td className="monospace large leftPadding1em">
+                {wpmTrue.toFixed(2).toString().padStart(6, "0")} wm
+                <sup>{-1}</sup>
               </td>
             </tr>
           </tbody>
@@ -87,6 +98,13 @@ function Footer({
             <col />
           </colgroup>
           <tbody>
+            <tr>
+              <td>Prompt: </td>
+              <td className="monospace large leftPadding1em">{prompt}</td>
+            </tr>
+
+            {/* <hr /> */}
+
             <tr>
               <td
               // className="boldText"

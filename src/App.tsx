@@ -70,6 +70,7 @@ function App() {
   const [elapsedTime, setElapsedTime] = useState(0);
 
   const [wpm, setWpm] = useState(0);
+  const [wpmTrue, setWpmTrue] = useState(0);
 
   const [errorRate, setErrorRate] = useState(0);
 
@@ -121,7 +122,6 @@ function App() {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [input]);
-
 
   // when the API becomes active
   useEffect(() => {
@@ -181,6 +181,9 @@ function App() {
         <TextInput
           input={input}
           apiActive={apiActive}
+          sentenceSelectorHidden={
+            results === [] || !results || results.length === 0 || !computed
+          }
           handleOnInput={handleOnInput}
           queryAPIStatus={queryAPIStatus}
           addKeydownListener={addKeydownListener}
@@ -189,28 +192,32 @@ function App() {
         <hr />
 
         {/* Sentence wheel selector */}
-        <SentenceSelector 
-          results={results} 
-          computed={computed} 
+        <SentenceSelector
+          results={results}
+          hidden={
+            results === [] || !results || results.length === 0 || !computed
+          }
           onChange={(targetArg) => {
             // edit top-level variable: target
             // note: all attempts to change state failed
             target = {
               id: targetArg.id,
-              value: (targetArg.value as string).slice(4)
-            }
-            addKeydownListener()
-          }} 
+              value: (targetArg.value as string).slice(4),
+            };
+            addKeydownListener();
+          }}
         />
 
         {/* {OldResultsSelector()} */}
       </div>
 
       <Footer
+        prompt={prompt}
         inputDelta={inputDelta}
         input={input}
         lhsEquiv={lhsEquiv}
         rhsEquiv={rhsEquiv}
+        wpmTrue={wpmTrue}
         wpm={wpm}
         errorRate={errorRate}
         elapsedTime={elapsedTime}
@@ -248,7 +255,6 @@ function App() {
   }
 
   function handleKeydown(e: KeyboardEvent) {
-
     e.preventDefault();
 
     // listen for enter key
@@ -335,7 +341,7 @@ function App() {
       }
 
       console.log("Notice: setting wpm");
-      setWpm(correctWordsCount / elapsedTimeMins);
+      setWpmTrue(correctWordsCount / elapsedTimeMins);
     }
 
     // recalculate error rates
@@ -497,7 +503,6 @@ function App() {
       (response) => {
         // generate the results array
         const resultsArray = response.data;
-        resultsArray.reverse();
         setResults(resultsArray);
 
         setComputed(true);
