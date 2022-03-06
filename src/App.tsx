@@ -86,16 +86,9 @@ function App() {
     },
     responseType: "json",
   };
+
   // const host = "http://localhost:8080";
   const host = "https://mirrored-keyboard.herokuapp.com";
-
-  useEffect(() => {
-    // get left and right forms
-    getPromptLeftForm();
-    getPromptRightForm();
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [prompt]);
 
   // on page load
   useEffect(() => {
@@ -106,8 +99,19 @@ function App() {
     // alert("resetting start time")
     setStartTime(performance.now());
 
+    // TODO: calculate non-selection wpm:
+    setWpm(0);
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    // get left and right forms
+    getPromptLeftForm();
+    getPromptRightForm();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prompt]);
 
   // on update of input => update stats, results
   useEffect(() => {
@@ -149,6 +153,9 @@ function App() {
       return;
     }
 
+    // clear input, results, prompt
+    cleanPage()
+
     // query API status every second
     const interval = setInterval(() => {
       queryAPIStatus();
@@ -160,13 +167,26 @@ function App() {
 
   let target: PickerData | undefined;
 
+  const inactiveApiNotification = (
+    <div id='inactiveNotification'>
+      Our back-end services are currently inactive
+      <br />
+      Apologies for any inconvenience
+    </div>
+  );
+
   return (
     <div className="App">
+
       <Header />
+
+      {/* inactive API notification */}
+      {apiActive ? "" : inactiveApiNotification}
 
       <hr />
 
       <div id="content">
+
         {/* Sentence prompt */}
         <Prompt
           prompt={prompt}
@@ -224,6 +244,14 @@ function App() {
       />
     </div>
   );
+
+  function cleanPage() {
+    // clear input, input delta
+    clearInput(setInput, setInputDelta);
+
+    // clear prompt
+    setPrompt("");
+  }
 
   function handleOnInput(event: React.FormEvent<HTMLInputElement>) {
     queryAPIStatus();
@@ -323,24 +351,22 @@ function App() {
   }
 
   function updateAllMetrics(prompt: string, correct: boolean) {
-    // recalculate wpm
+    // recalculate wpm (true)
     {
       const msToMins = 1 / (Math.pow(10, 3) * 60);
 
       // get number of correct words
       let elapsedTimeMins = elapsedTime * msToMins;
       console.log("elapsed mins (not updated): " + elapsedTimeMins);
-      let correctWordsCount = wpm * elapsedTimeMins;
+      let correctWordsCount = wpmTrue * elapsedTimeMins;
       console.log("correct words count: " + correctWordsCount);
 
       elapsedTimeMins = (performance.now() - startTime) * msToMins;
       console.log("elapsed mins (updated): " + elapsedTimeMins);
 
-      if (correct) {
-        correctWordsCount += countWords(prompt);
-      }
+      if (correct) correctWordsCount += countWords(prompt);
 
-      console.log("Notice: setting wpm");
+      console.log("Notice: setting wpmTrue");
       setWpmTrue(correctWordsCount / elapsedTimeMins);
     }
 
@@ -351,9 +377,7 @@ function App() {
 
       totalWordCountLocal += countWords(prompt);
 
-      if (!correct) {
-        errorCount += countWords(prompt);
-      }
+      if (!correct) errorCount += countWords(prompt);
 
       console.log("Notice: setting error rate");
       setErrorRate((errorCount / totalWordCountLocal) * 100);
