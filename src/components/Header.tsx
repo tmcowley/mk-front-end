@@ -1,7 +1,7 @@
 function Header() {
   return (
     <header className="App-header">
-      <p>Mirrored keyboard Learning Platform</p>
+      <p>Mirrored-Keyboard Learning Platform</p>
     </header>
   );
 }
