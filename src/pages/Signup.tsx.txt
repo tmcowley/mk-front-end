@@ -1,0 +1,83 @@
+{/* https://formik.org/docs/overview */}
+        <Formik
+          initialValues={{ age: undefined, speed: undefined }}
+          validate={(values) => {
+            type errorsType = {
+              age: string | undefined;
+              speed: string | undefined;
+            };
+            const errors: errorsType = { age: undefined, speed: undefined };
+            const age: number | undefined = values.age;
+            const speed: number | undefined = values.speed;
+
+            // validate age
+            if (!age) {
+              errors.age = "Age is required";
+            } else if (age < 13) {
+              errors.age = "Minimum user-age is 13";
+            } else if (age > 200) {
+              errors.age = "You're over 200 years old, incredible!";
+            }
+
+            // validate speed
+            if (!speed) {
+              errors.speed = "Typing speed is required";
+            } else if (speed < 0) {
+              errors.speed = "Typing speed cannot be negative";
+            } else if (speed > 400) {
+              errors.speed = "Crikey, you're fast at typing!";
+            }
+
+            return errors;
+          }}
+          onSubmit={(values, { setSubmitting }) => {
+
+            alert('yee')
+            setTimeout(() => {
+              alert(JSON.stringify(values, null, 2));
+              setSubmitting(false);
+            }, 400);
+          }}
+        >
+          {({ isSubmitting }) => (
+            <Form>
+              <table>
+                <tbody>
+                {/* <tr>
+                  <th></th>
+                  <th></th>
+                </tr> */}
+
+                <tr>
+                  <td>
+                    <label htmlFor="age">Age: </label>
+                  </td>
+                  <td>
+                    <Field type="number" name="age" />
+                  </td>
+                </tr>
+
+                <tr>
+                  <td>
+                    <label htmlFor="speed">Speed: </label>
+                  </td>
+                  <td>
+                    <Field type="number" name="speed" />
+                  </td>
+                </tr>
+                </tbody>
+              </table>
+
+              <br />
+
+              <ErrorMessage name="age" component="div" />
+              <ErrorMessage name="speed" component="div" />
+
+              <br />
+
+              <button type="submit" disabled={isSubmitting}>
+                Submit
+              </button>
+            </Form>
+          )}
+        </Formik>

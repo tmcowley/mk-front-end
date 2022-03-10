@@ -30,7 +30,13 @@ import {
 
 // import logo from './logo.svg';
 
-function Demo() {
+function Demo({
+  host, 
+  axiosConfig
+}: {
+  host: string;
+  axiosConfig: AxiosRequestConfig
+}) {
   // text input and input delta (added characters)
   const [input, setInput] = useState("");
   const [inputDelta, setInputDelta] = useState("");
@@ -77,18 +83,6 @@ function Demo() {
   const [notificationEnabled, setNotificationEnabled] = useState(true)
 
   // const [resultIndex, setResultIndex] = useState(null);
-
-  // API & Axios config
-  const axiosConfig: AxiosRequestConfig<string> = {
-    headers: {
-      // 'Content-Length': 0,
-      "Content-Type": "text/plain",
-    },
-    responseType: "json",
-  };
-
-  // const host = "http://localhost:8080";
-  const host = "https://mirrored-keyboard.herokuapp.com";
 
   // on page load
   useEffect(() => {
