@@ -28,8 +28,8 @@ function App() {
     responseType: "json",
   };
 
-  const host = "http://localhost:8080";
-  // const host = "https://mirrored-keyboard.herokuapp.com";
+  // const host = "http://localhost:8080";
+  const host = "https://mirrored-keyboard.herokuapp.com";
 
   return (
     <Router>
