@@ -1,8 +1,5 @@
 import React from "react";
 
-// for ReactDOM.render(), e.g. ReactDOM.render(results, document.getElementById("results"));
-// import ReactDOM from "react-dom";
-
 import axios, {
   AxiosRequestConfig,
   // AxiosResponse
@@ -16,6 +13,7 @@ import {
   // BrowserRouter as Router,
   // Routes,
   // Route,
+  useNavigate, 
   Link,
 } from "react-router-dom";
 
@@ -26,15 +24,17 @@ function Login({
   host: string;
   axiosConfig: AxiosRequestConfig;
 }) {
+  const navigate = useNavigate();
+
   return (
-    <div id="loginBody">
-      <div id="login">
+    <div id="formBody">
+      <div id="form">
         <h1 className="centre">Login</h1>
         <p>
           Please login with your user-code <br />
           (of the form "word-word-word") <br />
           <br />
-          Alternatively, <Link to="/sign-up">Sign up</Link>
+          Alternatively, <Link to="/signup">Sign-up</Link> or <Link to="/">Return Home</Link>
         </p>
 
         <br />
@@ -69,6 +69,8 @@ function Login({
             if (!errors.userCode) return {};
             return errors;
           }}
+          
+          // https://stackoverflow.com/questions/60705833/how-disable-the-auto-reset-form-on-submit-in-formik
           onSubmit={
             (values, { setSubmitting, resetForm, setStatus, setErrors }) => {
               // setTimeout(() => {
@@ -81,9 +83,11 @@ function Login({
               const path = "/post/login";
               const url = host + path;
 
-              const data = {
-                'userCode': values.userCode as string,
-              };
+              const data = JSON.stringify(values, null, 2)
+
+              // const data = {
+              //   'userCode': values.userCode as string,
+              // };
 
               axiosConfig["headers"] = {
                 // 'Content-Length': 0,
@@ -104,9 +108,10 @@ function Login({
 
                   console.log("Notice: successful login")
                   setSubmitting(true);
+                  navigate("/learn")
                 },
                 (error) => {
-                  console.log("user-code login API endpoint down/ failed");
+                  console.log("Error: user login failed");
                   setErrors({userCode: "user-code login failed"})
                   setSubmitting(false);
                   return;
@@ -142,21 +147,12 @@ function Login({
               <br />
 
               <button type="submit" disabled={isSubmitting}>
-                Submit
+                Login
               </button>
             </Form>
           )}
         </Formik>
 
-        {/* <form>
-          <label htmlFor="age">Age:</label>
-          <br />
-          <input type="number" id="age" name="age" />
-          <br />
-          <label htmlFor="typing speed">Last name:</label>
-          <br />
-          <input type="number" id="speed" name="speed" />
-        </form> */}
       </div>
     </div>
   );

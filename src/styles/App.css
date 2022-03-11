@@ -37,7 +37,7 @@ body {
 
   margin-left: 10px;
   margin-right: 10px;
-  margin-bottom: 10px;
+  margin-bottom: 0px;
 
   height: fit-content;
 
@@ -264,3 +264,21 @@ td {
 }
 
 /* inset-0 z-50 flex items-center bg-black  mx-4 max-w-screen-sm bg-lightBrown p-1 text-md mb-8 sm:mb-8 */
+
+.navButton {
+  color: white;
+  font-size: x-large;
+  font-weight: bolder;
+  background: none;
+  border: none;
+  /* border: 1px solid white; */
+  /* border-radius: 5px; */
+
+  /* margin-top: 0px !important;
+  padding-top: -10px !important; */
+
+  margin-top: -15px; /*for exact positioning */
+
+
+  cursor:pointer;
+}

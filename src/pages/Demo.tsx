@@ -166,7 +166,7 @@ function Demo({
   return (
     <div className="App">
 
-      < InactiveApiNotification
+      <InactiveApiNotification
         hidden = {apiActive || !notificationEnabled}
       />
 

@@ -1,0 +1,16 @@
+/* source: https://www.digitalocean.com/community/tutorials/react-react-burger-menu-sidebar */
+
+/* Individual item */
+.bm-item {
+  display: inline-block;
+
+  color: #d1d1d1;
+  margin-bottom: 10px;
+  text-align: left;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.bm-item:hover {
+  color: #ffffff;
+}
