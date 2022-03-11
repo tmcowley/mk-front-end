@@ -524,6 +524,7 @@ function Demo({
         setComputed(true);
       },
       (error) => {
+        console.log("Error: input submission failed")
         console.log(error);
         setComputed(false);
         setResults(undefined);
@@ -531,6 +532,7 @@ function Demo({
       }
     );
   }
+
   function populatePrompt() {
     // get new prompt, populate
     const path = "/get/random-phrase";
