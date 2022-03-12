@@ -2,8 +2,8 @@ type FooterProps = {
   prompt: string;
   inputDelta: string;
   input: string;
-  lhsEquiv: string;
-  rhsEquiv: string;
+  inputLeft: string;
+  inputRight: string;
 
   wpm: number;
   wpmTrue: number;
@@ -15,8 +15,8 @@ function Footer({
   prompt,
   inputDelta,
   input,
-  lhsEquiv,
-  rhsEquiv,
+  inputLeft,
+  inputRight,
   wpm,
   wpmTrue,
   errorRate,
@@ -119,7 +119,7 @@ function Footer({
               >
                 Left form:{" "}
               </td>
-              <td className="monospace large leftPadding1em">{lhsEquiv}</td>
+              <td className="monospace large leftPadding1em">{inputLeft}</td>
             </tr>
             <tr>
               <td
@@ -127,7 +127,7 @@ function Footer({
               >
                 Right form:{" "}
               </td>
-              <td className="monospace large leftPadding1em">{rhsEquiv}</td>
+              <td className="monospace large leftPadding1em">{inputRight}</td>
             </tr>
           </tbody>
         </table>

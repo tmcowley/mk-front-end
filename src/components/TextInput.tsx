@@ -6,7 +6,7 @@ type TextInputProps = {
   apiActive: boolean;
   sentenceSelectorHidden: boolean;
   handleOnInput: Function;
-  queryAPIStatus: Function;
+  queryServiceStatus: Function;
   addKeydownListener: Function;
 };
 
@@ -15,7 +15,7 @@ function TextInput({
   apiActive,
   sentenceSelectorHidden,
   handleOnInput,
-  queryAPIStatus,
+  queryServiceStatus,
   addKeydownListener,
 }: TextInputProps) {
   return (
@@ -30,7 +30,7 @@ function TextInput({
           type="text"
           value={input}
           onInput={(e) => handleOnInput(e)}
-          onFocus={(_) => queryAPIStatus()}
+          onFocus={(_) => queryServiceStatus()}
           disabled={!apiActive}
         />
       </label>

@@ -2,22 +2,16 @@
 
 import Sidebar from "../components/Sidebar";
 
-function Header() {
+function Header({isLoggedIn}: {isLoggedIn: boolean}) {
   return (
     <>
       <header className="App-header">
           <Sidebar
             pageWrapId={"content"}
             outerContainerId={"App"}
+            isLoggedIn={isLoggedIn}
           />
         <p>Mirrored-Keyboard Platform</p>
-
-        {/* <Link to="/signup">
-          <button className="navButton">Sign-up</button>
-        </Link>
-        <Link to="/login">
-          <button className="navButton">Login</button>
-        </Link> */}
       </header>
     </>
   );

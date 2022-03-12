@@ -2,12 +2,13 @@ import { selectInputBox } from "../utils/methods"
 
 type PromptProps = {
   prompt: string;
-  promptLHS: string;
-  promptRHS: string;
+  promptLeft: string;
+  promptRight: string;
   populatePrompt: Function;
 };
 
-function Prompt({ prompt, promptLHS, promptRHS, populatePrompt }: PromptProps) {
+function Prompt({ prompt, promptLeft, promptRight, populatePrompt }: PromptProps) {
+
   return (
     <div id="promptText">
       <p>{prompt === "" ? "Prompt goes here" : prompt.replaceAll(" ", "_")}</p>
@@ -15,10 +16,10 @@ function Prompt({ prompt, promptLHS, promptRHS, populatePrompt }: PromptProps) {
       <button type="button" onClick={(_) => copyText(prompt)}>
         Copy
       </button>
-      <button type="button" onClick={(_) => copyText(promptLHS)}>
+      <button type="button" onClick={(_) => copyText(promptLeft)}>
         Copy LHS
       </button>
-      <button type="button" onClick={(_) => copyText(promptRHS)}>
+      <button type="button" onClick={(_) => copyText(promptRight)}>
         Copy RHS
       </button>
       <button type="button" onClick={(_) => skipPrompt()}>

@@ -1,189 +1,231 @@
-// abandoned
-// issues with using setState methods (or Dispatch<SetStateAction<boolean>> s)
+import axios, { AxiosResponse } from "axios";
+import { apiConfig } from '../constants/APIConfig'
 
-import {Dispatch, SetStateAction} from 'react';
+enum Side {
+    Left,
+    Right,
+}
 
-import axios, { 
-    AxiosRequestConfig
-    // AxiosResponse 
-} from "axios";
-
-// API & Axios config
-const axiosConfig: AxiosRequestConfig<string> = {
-    headers: {
-        // 'Content-Length': 0,
-        "Content-Type": "text/plain",
-    },
-    responseType: "json",
-};
-// const host = "http://localhost:8080";
-const host = "https://mirrored-keyboard.herokuapp.com";
-
-// type setApiActiveType = Dispatch<SetStateAction<boolean>>;
-// type setApiActiveType = ((_: boolean) => void) | Dispatch<SetStateAction<boolean>>;
-type setApiActiveType = any;
-
-export function queryAPIStatus(setApiActive: setApiActiveType) {
-    const path = "/get/status";
+export function queryServiceStatus(
+    onSuccess: (response: AxiosResponse<any, any>) => void,
+    onFail: (error: AxiosResponse<any, any>) => void
+) {
+    const { apiVersion, host, axiosGetConfigGenerator } = apiConfig
+    const path = apiVersion + "get-status";
     const url = host + path;
 
-    axios.get(url).then(
+    axios.get(url, axiosGetConfigGenerator({})).then(
         (response) => {
-            // console.log("queryAPIStatus() - Response found");
-            // console.log(response);
-            setApiActive(true);
+            console.log(`${path} - response found: `)
+            console.log(response)
+            onSuccess(response);
         },
         (error) => {
-            console.log("queryAPIStatus() - API endpoints down");
-            // console.log(error);
-
-            setApiActive(false);
+            console.log(`${path} - error found: `)
+            console.log(error)
+            onFail(error)
         }
     );
 }
 
-export function renderEquivalents(input: string, setLhsEquiv: Function, setRhsEquiv: Function, setApiActive: setApiActiveType) {
-    if (!input || input === "") {
-        setLhsEquiv("");
-        setRhsEquiv("");
+export function submit(
+    input: string,
+    onSuccess: (response: AxiosResponse<any, any>) => void,
+    onFail: (error: AxiosResponse<any, any>) => void
+) {
+    if (input === "") return
+
+    const { apiVersion, host, axiosGetConfigGenerator } = apiConfig
+    const path = apiVersion + "submit"
+    const url = host + path
+
+    axios.get(url, axiosGetConfigGenerator({ 'input': input })).then(
+        (response) => {
+            console.log(`${path} - response found: `)
+            console.log(response)
+            // let resultsArray = response.data as string[]
+            onSuccess(response)
+        },
+        (error) => {
+            console.log(`${path} - error found: `)
+            console.log(error)
+            onFail(error)
+        }
+    );
+}
+
+/**
+ * get a random phrase from the phrase set
+ * @param onSuccess embedded into promise.then() response anon function
+ * @param onFail embedded into promise.then() error anon function
+ */
+export function getRandomPhrase(
+    onSuccess: (response: AxiosResponse<any, any>) => void,
+    onFail: (error: AxiosResponse<any, any>) => void
+) {
+    const { apiVersion, host, axiosGetConfigGenerator } = apiConfig
+    const path = apiVersion + "get-random-phrase";
+    const url = host + path;
+
+    axios.get(url, axiosGetConfigGenerator({})).then(
+        (response) => {
+            console.log(`${path} - response found: `)
+            console.log(response)
+            onSuccess(response)
+        },
+        (error) => {
+            console.log(`${path} - error found: `)
+            console.log(error)
+            onFail(error)
+        }
+    );
+}
+
+export function getLeftEquivalent(
+    str: string,
+    onSuccess: (error: AxiosResponse<any, any>) => void,
+    onFail?: (error: AxiosResponse<any, any>) => void
+) {
+    getSideEquivalent(Side.Left, str, onSuccess, onFail)
+}
+
+export function getRightEquivalent(
+    str: string,
+    onSuccess: (error: AxiosResponse<any, any>) => void,
+    onFail?: (error: AxiosResponse<any, any>) => void
+) {
+    getSideEquivalent(Side.Right, str, onSuccess, onFail)
+}
+
+function getSideEquivalent(
+    half: Side,
+    str: string,
+    onSuccess: (response: AxiosResponse<any, any>) => void,
+    onFail?: (error: AxiosResponse<any, any>) => void
+) {
+    if (str === "") return
+
+    const { apiVersion, host, axiosGetConfigGenerator } = apiConfig
+
+    let path = apiVersion
+    if (half === Side.Left) {
+        path = path + "convert-lhs";
+    } else if (half === Side.Right) {
+        path = path + "convert-rhs";
+    } else {
+        return
     }
 
-    // calculate lhs interpretation
-    var path = "/get/convert/lhs";
-    var url = host + path;
+    let url = host + path;
 
-    let config: AxiosRequestConfig<string> = axiosConfig;
-    config["params"] = {
-        input: input,
-    };
-
-    axios.get(url, config).then(
+    axios.get(url, axiosGetConfigGenerator({ 'input': str })).then(
         (response) => {
-            // console.log(response);
-
-            const lhsEquiv = response.data;
-            setLhsEquiv(lhsEquiv);
+            console.log(`${path} - response found: `);
+            console.log(response)
+            // let equiv = response.data as string
+            onSuccess(response)
         },
         (error) => {
-            console.log(error);
-            queryAPIStatus(setApiActive);
-        }
-    );
-
-    path = "/get/convert/rhs";
-    url = host + path;
-
-    axios.get(url, config).then(
-        (response) => {
-            // console.log(response);
-
-            const rhsEquiv = response.data;
-            setRhsEquiv(rhsEquiv);
-        },
-        (error) => {
-            console.log(error);
-            queryAPIStatus(setApiActive);
+            console.log(`${path} - error found: `)
+            console.log(error)
+            onFail?.(error)
         }
     );
 }
 
-export function getPromptLeftForm(setPromptLHS: Function, setApiActive: setApiActiveType) {
-    // calculate lhs interpretation
-    var path = "/get/convert/lhs";
-    var url = host + path;
-
-    let config: AxiosRequestConfig<string> = axiosConfig;
-    config["params"] = {
-        input: prompt,
-    };
-
-    axios.get(url, config).then(
-        (response) => {
-            // console.log(response);
-            const result = response.data;
-
-            setPromptLHS(result);
-        },
-        (error) => {
-            console.log(error);
-            queryAPIStatus(setApiActive);
-        }
-    );
-}
-
-export function getPromptRightForm(setPromptRHS: Function, setApiActive: setApiActiveType) {
-    // calculate rhs interpretation
-    var path = "/get/convert/rhs";
-    var url = host + path;
-
-    let config: AxiosRequestConfig<string> = axiosConfig;
-    config["params"] = {
-        input: prompt,
-    };
-
-    axios.get(url, config).then(
-        (response) => {
-            // console.log(response);
-
-            const result = response.data;
-
-            setPromptRHS(result);
-        },
-        (error) => {
-            console.log(error);
-            queryAPIStatus(setApiActive);
-        }
-    );
-}
-
-export function postInput(input: string, setComputed: Function, setResults: Function, setApiActive: setApiActiveType) {
-    if (!input || input === "") {
-        setComputed(false);
-        return;
-    }
-
-    const path = "/get/submit";
+export function signOut(
+    onSuccess: (response: AxiosResponse<any, any>) => void,
+    onFail?: (error: AxiosResponse<any, any>) => void
+) {
+    const { apiVersion, host, axiosPostConfig } = apiConfig
+    const path = apiVersion + "sign-out";
     const url = host + path;
+    const data = null;
 
-    let config: AxiosRequestConfig<string> = axiosConfig;
-    config["params"] = {
-        input: input,
-    };
-
-    axios.get(url, config).then(
+    axios.post(url, data, axiosPostConfig).then(
         (response) => {
-            // generate the results array
-            const resultsArray = response.data;
-            resultsArray.reverse();
-            setResults(resultsArray);
-
-            setComputed(true);
+            console.log(`${path} - response found: `);
+            console.log(response)
+            onSuccess(response)
         },
         (error) => {
-            console.log(error);
-            setComputed(false);
-            setResults(undefined);
-            queryAPIStatus(setApiActive);
+            console.log(`${path} - error found: `)
+            console.log(error)
+            onFail?.(error)
         }
     );
 }
 
-export function populatePrompt(setPrompt: Function, setApiActive: setApiActiveType) {
-    // get new prompt, populate
-    const path = "/get/random-phrase";
+export function signIn(
+    formValues: {userCode: string}, 
+    onSuccess: (response: AxiosResponse<any, any>) => void,
+    onFail?: (error: AxiosResponse<any, any>) => void
+) {
+    const { apiVersion, host, axiosPostConfig } = apiConfig
+    const path = apiVersion + "sign-in";
     const url = host + path;
+    const data = JSON.stringify(formValues, null, 2)
 
-    axios.get(url).then(
+    axios.post(url, data, axiosPostConfig).then(
         (response) => {
-            // set prompt text
-            let prompt: string = response.data;
-            prompt = prompt.toLowerCase();
-            setPrompt(prompt);
+            console.log(`${path} - response found: `);
+            console.log(response)
+            onSuccess(response)
         },
         (error) => {
-            console.log("Error");
-            console.log(error);
-            queryAPIStatus(setApiActive);
+            console.log(`${path} - error found: `)
+            console.log(error)
+            onFail?.(error)
         }
+    );
+}
+
+export function signUp(
+    formValues: {
+        age: number | undefined,
+        speed: number | undefined,
+      }, 
+    onSuccess: (response: AxiosResponse<any, any>) => void,
+    onFail?: (error: AxiosResponse<any, any>) => void
+){
+    const { apiVersion, host, axiosPostConfig } = apiConfig
+    const path = apiVersion + "sign-up";
+    const url = host + path;
+    const data = JSON.stringify(formValues, null, 2)
+
+    axios.post(url, data, axiosPostConfig).then(
+      (response) => {
+        console.log(`${path} - response found: `);
+        console.log(response)
+        onSuccess(response)
+      },
+      (error) => {
+        console.log(`${path} - error found: `)
+        console.log(error)
+        onFail?.(error)
+      }
+    );
+}
+
+export function isLoggedIn(
+    onSuccess: (response: AxiosResponse<any, any>) => void,
+    onFail?: (error: AxiosResponse<any, any>) => void
+){
+    const { apiVersion, host, axiosPostConfig } = apiConfig
+    const path = apiVersion + "is-logged-in"
+    const url = host + path
+    const data = null
+
+    axios.post(url, data, axiosPostConfig).then(
+      (response) => {
+        console.log(`${path} - response found: `);
+        console.log(response)
+        onSuccess(response)
+      },
+      (error) => {
+        console.log(`${path} - error found: `)
+        console.log(error)
+        onFail?.(error)
+      }
     );
 }

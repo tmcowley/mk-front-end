@@ -1,10 +1,3 @@
-import React from "react";
-
-import axios, {
-  AxiosRequestConfig,
-  // AxiosResponse
-} from "axios";
-
 import "../styles/Forms.css";
 
 import { Formik, Form, Field, ErrorMessage } from "formik";
@@ -17,24 +10,20 @@ import {
   Link,
 } from "react-router-dom";
 
-function Login({
-  host,
-  axiosConfig,
-}: {
-  host: string;
-  axiosConfig: AxiosRequestConfig;
-}) {
+import { signIn } from '../utils/api-calls'
+
+function Signin() {
   const navigate = useNavigate();
 
   return (
     <div id="formBody">
       <div id="form">
-        <h1 className="centre">Login</h1>
+        <h1 className="centre">Sign-in</h1>
         <p>
-          Please login with your user-code <br />
+          Please sign-in with your user-code <br />
           (of the form "word-word-word") <br />
           <br />
-          Alternatively, <Link to="/signup">Sign-up</Link> or <Link to="/">Return Home</Link>
+          Alternatively, <Link to="/sign-up">Sign-up</Link> or <Link to="/">Return Home</Link>
         </p>
 
         <br />
@@ -72,51 +61,28 @@ function Login({
           
           // https://stackoverflow.com/questions/60705833/how-disable-the-auto-reset-form-on-submit-in-formik
           onSubmit={
-            (values, { setSubmitting, resetForm, setStatus, setErrors }) => {
-              // setTimeout(() => {
-              //   alert(JSON.stringify(values, null, 2));
-              //   setSubmitting(false);
-              // }, 400);
-
-              // validate user-code on back-end
-
-              const path = "/post/login";
-              const url = host + path;
-
-              const data = JSON.stringify(values, null, 2)
-
-              // const data = {
-              //   'userCode': values.userCode as string,
-              // };
-
-              axiosConfig["headers"] = {
-                // 'Content-Length': 0,
-                "Content-Type": "application/json"
-              }
-
-              axios.post(url, data, axiosConfig).then(
-                (response) => {
-                  // console.log("queryAPIStatus() - Response found");
-                  console.log(response);
-
-                  const userLoggedIn = response.data as boolean;
-                  if (!userLoggedIn) {
-                    setErrors({userCode: "user-code does not exist"})
+            (values, { setSubmitting, setErrors }) => {
+              setTimeout(() => {
+                // sign-in user using their user-code
+                signIn(
+                  values, 
+                  (response) => {
+                    const userLoggedIn = response.data as boolean;
+                    if (!userLoggedIn) {
+                      setErrors({ userCode: "user-code does not exist" })
+                      setSubmitting(false);
+                    } else {
+                      console.log("Notice: successful login")
+                      setSubmitting(true);
+                      navigate("/")
+                    }
+                  }, 
+                  (error) => {
+                    setErrors({ userCode: "user-code login failed" })
                     setSubmitting(false);
-                    return;
                   }
-
-                  console.log("Notice: successful login")
-                  setSubmitting(true);
-                  navigate("/learn")
-                },
-                (error) => {
-                  console.log("Error: user login failed");
-                  setErrors({userCode: "user-code login failed"})
-                  setSubmitting(false);
-                  return;
-                }
-              );
+                )
+              }, 200);            
             }
           }
         >
@@ -158,4 +124,4 @@ function Login({
   );
 }
 
-export default Login;
+export default Signin;

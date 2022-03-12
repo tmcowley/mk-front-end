@@ -1,29 +1,12 @@
-import React from "react";
-
-import axios, {
-  AxiosRequestConfig,
-  // AxiosResponse
-} from "axios";
-
 import "../styles/Forms.css";
 
 import { Formik, Form, Field, ErrorMessage } from "formik";
 
-import {
-  // BrowserRouter as Router,
-  // Routes,
-  // Route,
-  useNavigate,
-  Link,
-} from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
-function Signup({
-  host,
-  axiosConfig,
-}: {
-  host: string;
-  axiosConfig: AxiosRequestConfig;
-}) {
+import { signUp } from "../utils/api-calls";
+
+function Signup() {
   const navigate = useNavigate();
 
   return (
@@ -32,8 +15,10 @@ function Signup({
         <h1 className="centre">Sign-up</h1>
         <p>
           Please sign-up using your current typing speed
-          <br /><br />
-          Alternatively, <Link to="/login">Login</Link> or <Link to="/">Return Home</Link>
+          <br />
+          <br />
+          Alternatively, <Link to="/sign-in">Sign-in</Link> or{" "}
+          <Link to="/">Return Home</Link>
         </p>
 
         <br />
@@ -43,21 +28,18 @@ function Signup({
           initialValues={{
             age: undefined,
             speed: undefined,
-            general: undefined,
           }}
           validate={(values) => {
             type errorsType = {
               age: string | undefined;
               speed: string | undefined;
-              general: string | undefined;
-            };
+            }
             const errors: errorsType = {
               age: undefined,
               speed: undefined,
-              general: undefined,
-            };
-            const age: number | undefined = values.age;
-            const speed: number | undefined = values.speed;
+            }
+            const age: number | undefined = values.age
+            const speed: number | undefined = values.speed
 
             // validate age
             if (!age) {
@@ -85,44 +67,27 @@ function Signup({
           }}
           onSubmit={(values, { setSubmitting, setErrors }) => {
             setTimeout(() => {
-              const path = "/post/signup";
-              const url = host + path;
-
-              const data = JSON.stringify(values, null, 2);
-
-              // const data = {
-              //   'userCode': values.userCode as string,
-              // };
-
-              axiosConfig["headers"] = {
-                // 'Content-Length': 0,
-                "Content-Type": "application/json",
-              };
-
-              axios.post(url, data, axiosConfig).then(
+              // validate user-code on back-end
+              signUp(
+                values,
                 (response) => {
-                  console.log(response);
-
                   const userCode = response.data as string | null;
-
                   if (!userCode) {
-                    setErrors({ general: "User sign-up failed" });
+                    setErrors({ age: "User sign-up failed" });
                     setSubmitting(false);
-                    return;
+                  } 
+                  else {
+                    console.log("Notice: successful sign-up");
+                    setSubmitting(true);
+                    navigate("/");
                   }
-
-                  console.log("Notice: successful sign-up");
-                  setSubmitting(true);
-                  navigate("/learn");
                 },
                 (error) => {
-                  console.log("Error: user sign-up failed");
-                  setErrors({ general: "User sign-up failed" });
+                  setErrors({ age: "User sign-up failed" });
                   setSubmitting(false);
-                  return;
                 }
               );
-            }, 400);
+            }, 200);
           }}
         >
           {({ isSubmitting }) => (

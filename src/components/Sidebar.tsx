@@ -1,83 +1,54 @@
-import { slide as Menu } from "react-burger-menu";
+import { slide as Menu } from "react-burger-menu"
 
-import "../styles/Sidebar.css";
+import "../styles/Sidebar.css"
+
+import { styles } from '../constants/constants'
 
 type SidebarProps = {
   pageWrapId: string;
   outerContainerId: string;
+  isLoggedIn: boolean;
 };
 
-function Sidebar({ pageWrapId, outerContainerId }: SidebarProps) {
-
-  // source: https://github.com/negomi/react-burger-menu
-  var styles = {
-    bmBurgerButton: {
-      position: "fixed",
-      width: "36px",
-      height: "30px",
-      left: "36px",
-      top: "36px",
-    },
-    bmBurgerBars: {
-      background: "#373a47",
-    },
-    bmBurgerBarsHover: {
-      background: "#a90000",
-    },
-    bmCrossButton: {
-      height: "24px",
-      width: "24px",
-    },
-    bmCross: {
-      background: "#bdc3c7",
-    },
-    bmMenuWrap: {
-      position: "fixed",
-      height: "100%",
-    },
-    bmMenu: {
-      // background: "#373a47",
-      background: "#f0f0f2",
-
-      marginLeft: "-10px",
-      marginTop: "-5px",
-
-      padding: "2.5em 1.5em 0",
-      fontSize: "1.15em",
-    },
-    bmMorphShape: {
-      fill: "#373a47",
-    },
-    bmItemList: {
-      color: "#b8b7ad",
-      padding: "0.8em",
-    },
-    bmItem: {
-      display: "inline-block",
-    },
-    bmOverlay: {
-      background: "rgba(0, 0, 0, 0.3)",
-    },
-  };
-
+function Sidebar({ pageWrapId, outerContainerId, isLoggedIn }: SidebarProps) {
+  
   return (
-    <Menu
-      pageWrapId={pageWrapId}
-      outerContainerId={outerContainerId}
-      styles={styles}
-    >
-      <a className="menu-item" href="/">
-        Home
-      </a>
-      <br />
-      <a className="menu-item" href="/login">
-        Login
-      </a>
-      <br />
-      <a className="menu-item" href="/signup">
-        Sign-up
-      </a>
-    </Menu>
+    <>
+      <div hidden={isLoggedIn}>
+        <Menu
+          pageWrapId={pageWrapId}
+          outerContainerId={outerContainerId}
+          styles={styles}
+        >
+          <a className="menu-item" href="/">
+            Home
+          </a>
+          <br />
+          <a className="menu-item" href="/sign-in">
+            Sign-in
+          </a>
+          <br />
+          <a className="menu-item" href="/sign-up">
+            Sign-up
+          </a>
+        </Menu>
+      </div>
+      <div hidden={!isLoggedIn}>
+        <Menu
+          pageWrapId={pageWrapId}
+          outerContainerId={outerContainerId}
+          styles={styles}
+        >
+          <a className="menu-item" href="/learn">
+            Home
+          </a>
+          <br />
+          <a className="menu-item" href="/sign-out">
+            Sign-out
+          </a>
+        </Menu>
+      </div>
+    </>
   );
 }
 

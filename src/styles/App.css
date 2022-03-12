@@ -11,9 +11,9 @@ body {
 }
 
 #content {
-  padding: 10px;
-  margin: 10px;
-  min-height: 600px;
+  padding: 0.01px;
+  margin: 0.01px;
+  /* min-height: 600px; */
 }
 
 .App {
@@ -281,4 +281,13 @@ td {
 
 
   cursor:pointer;
+}
+
+#statusInfo {
+  width: 600px;
+  margin: 5em auto;
+  padding: 2em;
+  background-color: #fdfdff;
+  border-radius: 0.5em;
+  box-shadow: 2px 3px 7px 2px rgba(0,0,0,0.02);
 }

@@ -11,20 +11,17 @@ import WheelPicker, {
 // import { selectInputBox } from "../utils/methods";
 
 type SentenceSelectorProps = {
-  results: string[] | undefined;
-  hidden: boolean;
-  onChange: (target: PickerData) => void;
+  results: string[],
+  onChange: (target: PickerData) => void
 };
 
 function SentenceSelector({
   results,
-  hidden,
   onChange,
 }: SentenceSelectorProps) {
-  if (hidden || !results) return <></>;
 
   // convert results array to picker data
-  const data: Array<PickerData> = [];
+  let data: PickerData[] = [];
   results.forEach((sentence, index) => {
     const line: PickerData = {
       id: index.toString(),
@@ -33,6 +30,14 @@ function SentenceSelector({
     };
     data.push(line);
   });
+
+  const noResults = data.length === 0
+  if (noResults) {
+    data.push({
+      id: "0", 
+      value: "Enter above to populate results"
+    })
+  }
 
   // const ref: WheelPickerRef = {focus: onFocus, blur: onBlur};
   // const reactRef: React.Ref<WheelPickerRef> = createRef<WheelPickerRef>();
@@ -51,13 +56,13 @@ function SentenceSelector({
         // width={windowDimensions.width * 0.8}
         titleText="results wheel picker"
         itemHeight={30}
-        selectedID={data[0].id}
+        selectedID={data[0]?.id}
         color="#ccc"
         activeColor="#333"
         backgroundColor="#fff"
         shadowColor="white"
         idName="wheelPicker"
-        // ref={reactRef}
+        // ref={(pickerRef) => {}}
       />
     </div>
   );
