@@ -1,13 +1,9 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
+import { useState } from "react";
 
 import { queryServiceStatus } from "../utils/api-calls";
 import Sidebar from "../components/Sidebar";
 
 function Status() {
-  const navigate = useNavigate();
-
   const [apiDown, setAPIDown] = useState(false);
 
   queryServiceStatus(
