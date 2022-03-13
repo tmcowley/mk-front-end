@@ -161,10 +161,12 @@ export function signOut(
 }
 
 export function signIn(
-    formValues: {userCode: string}, 
+    formValues: { userCode: string },
     onSuccess: (response: AxiosResponse<any, any>) => void,
     onFail?: (error: AxiosResponse<any, any>) => void
 ) {
+    if (!validateString(formValues.userCode)) return
+
     const { apiVersion, host, axiosPostConfig } = apiConfig
     const path = apiVersion + "sign-in";
     const url = host + path;
@@ -188,48 +190,48 @@ export function signUp(
     formValues: {
         age: number | undefined,
         speed: number | undefined,
-      }, 
+    },
     onSuccess: (response: AxiosResponse<any, any>) => void,
     onFail?: (error: AxiosResponse<any, any>) => void
-){
+) {
     const { apiVersion, host, axiosPostConfig } = apiConfig
     const path = apiVersion + "sign-up";
     const url = host + path;
     const data = JSON.stringify(formValues, null, 2)
 
     axios.post(url, data, axiosPostConfig).then(
-      (response) => {
-        console.log(`${path} - response found: `);
-        console.log(response)
-        onSuccess(response)
-      },
-      (error) => {
-        console.log(`${path} - error found: `)
-        console.log(error)
-        onFail?.(error)
-      }
+        (response) => {
+            console.log(`${path} - response found: `);
+            console.log(response)
+            onSuccess(response)
+        },
+        (error) => {
+            console.log(`${path} - error found: `)
+            console.log(error)
+            onFail?.(error)
+        }
     );
 }
 
 export function isLoggedIn(
     onSuccess: (response: AxiosResponse<any, any>) => void,
     onFail?: (error: AxiosResponse<any, any>) => void
-){
+) {
     const { apiVersion, host, axiosPostConfig } = apiConfig
     const path = apiVersion + "is-logged-in"
     const url = host + path
     const data = null
 
     axios.post(url, data, axiosPostConfig).then(
-      (response) => {
-        console.log(`${path} - response found: `);
-        console.log(response)
-        onSuccess(response)
-      },
-      (error) => {
-        console.log(`${path} - error found: `)
-        console.log(error)
-        onFail?.(error)
-      }
+        (response) => {
+            console.log(`${path} - response found: `);
+            console.log(response)
+            onSuccess(response)
+        },
+        (error) => {
+            console.log(`${path} - error found: `)
+            console.log(error)
+            onFail?.(error)
+        }
     );
 }
