@@ -66,9 +66,10 @@ export function selectInputBox() {
 
 export function validateString(str: string): boolean {
 
-    // impose 40-character limit
-    if (str.length > 40) {
-        console.log(`Error: string invalid as exceeds 40-character limit`)
+    // impose 75-character limit
+    // (max phrase is of length 43)
+    if (str.length > 75) {
+        console.log(`Error: string invalid as exceeds 75-character limit`)
         return false
     }
 
