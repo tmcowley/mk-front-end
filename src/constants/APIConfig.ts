@@ -29,6 +29,7 @@ const axiosGetConfigGenerator = (params?: {}): AxiosRequestConfig<string> => {
 
 export const apiConfig: apiConfigType = {
   apiVersion: "/api/v0/",
+  // host: "error",
   // host: "http://localhost:8080",
   host: "https://mirrored-keyboard.herokuapp.com", 
   axiosGetConfigGenerator: axiosGetConfigGenerator,

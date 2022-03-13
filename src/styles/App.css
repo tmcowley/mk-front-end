@@ -291,3 +291,8 @@ td {
   border-radius: 0.5em;
   box-shadow: 2px 3px 7px 2px rgba(0,0,0,0.02);
 }
+
+td {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}

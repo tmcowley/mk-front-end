@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 // import local components
 import Footer from "../components/Footer";
@@ -29,6 +30,9 @@ import {
 function Platform({
   loggedIn
 }: {loggedIn: boolean}) {
+
+  const navigate = useNavigate();
+
   // text input and input delta (added characters)
   const [input, setInput] = useState("");
   const [inputLeft, setInputLeft] = useState("");
@@ -167,8 +171,11 @@ function Platform({
     // block active api state
     if (apiActive) return;
 
-    // clear input, results, prompt
-    clearPage();
+    // // clear input, results, prompt
+    // clearPage();
+
+    // // navigate to status page
+    // navigate("/status")
 
     // query API status every second
     const interval = setInterval(() => {
@@ -412,6 +419,12 @@ function Platform({
       },
       (error) => {
         setApiActive(false);
+        
+        // clear input, results, prompt
+        clearPage();
+
+        // navigate to status page
+        navigate("/status")
       }
     );
   }

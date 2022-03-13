@@ -57,7 +57,7 @@ function Footer({
               </td>
             </tr>
 
-            <tr>
+            {/* <tr>
               <td
               // className="boldText"
               >
@@ -67,13 +67,13 @@ function Footer({
                 {wpm.toFixed(2).toString().padStart(6, "0")} wm
                 <sup>{-1}</sup>
               </td>
-            </tr>
+            </tr> */}
 
             <tr>
               <td
               // className="boldText"
               >
-                Speed (full):{" "}
+                Speed:{" "}
               </td>
               <td className="monospace large leftPadding1em">
                 {wpmTrue.toFixed(2).toString().padStart(6, "0")} wm
