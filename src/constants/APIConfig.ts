@@ -15,7 +15,7 @@ const axiosPostConfig: AxiosRequestConfig<string> = {
   },
   responseType: "json",
 }
-const axiosGetConfigGenerator = (params: {}): AxiosRequestConfig<string> => {
+const axiosGetConfigGenerator = (params?: {}): AxiosRequestConfig<string> => {
   return {
     headers: {
       // 'Content-Length': 0,
@@ -25,13 +25,6 @@ const axiosGetConfigGenerator = (params: {}): AxiosRequestConfig<string> => {
     params: params,
   }
 }
-
-// let configGet = (params: {}) => {
-//   const { axiosGetConfig } = apiConfig
-//   let config = axiosGetConfig;
-//   config["params"] = params
-//   return config
-// }
 
 export const apiConfig: apiConfigType = {
   apiVersion: "/api/v0/",

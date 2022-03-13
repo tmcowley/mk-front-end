@@ -11,7 +11,8 @@ function Prompt({ prompt, promptLeft, promptRight, populatePrompt }: PromptProps
 
   return (
     <div id="promptText">
-      <p>{prompt === "" ? "Prompt goes here" : prompt.replaceAll(" ", "_")}</p>
+      {/* "␣", "_", prompt.replaceAll(" ", "_") */}
+      <p>{prompt === "" ? "Prompt goes here" : prompt}</p>
 
       <button type="button" onClick={(_) => copyText(prompt)}>
         Copy
