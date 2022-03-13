@@ -116,6 +116,13 @@ function Platform({
     // update metric: elapsed time
     setElapsedTime(performance.now() - startTime);
 
+    if (input === "") {
+      setInputLeft("")
+      setInputRight("")
+      setResults([])
+      return
+    }
+
     // calculate and render LHS and RHS interpretations
     APIgetLeftEquivalent(
       input, 
