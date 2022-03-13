@@ -66,6 +66,13 @@ export function selectInputBox() {
 
 export function validateString(str: string): boolean {
 
+    // impose 40-character limit
+    if (str.length > 40) {
+        console.log(`Error: string invalid as exceeds 40-character limit`)
+        return false
+    }
+
+    // character whitelist
     const whitelistArr = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!?.,-\' '.split('')
     const whitelistSet = new Set(whitelistArr)
 

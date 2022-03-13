@@ -31,6 +31,7 @@ function TextInput({
           value={input}
           onInput={(e) => handleOnInput(e)}
           onFocus={(_) => queryServiceStatus()}
+          maxLength={40}
           disabled={!apiActive}
         />
       </label>
