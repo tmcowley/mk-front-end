@@ -5,9 +5,10 @@ type PromptProps = {
   promptLeft: string;
   promptRight: string;
   populatePrompt: Function;
+  clearPage: Function;
 };
 
-function Prompt({ prompt, promptLeft, promptRight, populatePrompt }: PromptProps) {
+function Prompt({ prompt, promptLeft, promptRight, populatePrompt, clearPage }: PromptProps) {
 
   return (
     <div id="promptText">
@@ -44,9 +45,8 @@ function Prompt({ prompt, promptLeft, promptRight, populatePrompt }: PromptProps
   }
 
   function skipPrompt() {
-    // // cleanup page
-    // TODO
-    // clearPage();
+    // cleanup page
+    clearPage();
 
     // populate new prompt
     populatePrompt();

@@ -14,7 +14,6 @@ import {
   getStringDelta,
   countWords,
   selectInputBox,
-  clearInput,
 } from "../utils/methods";
 
 // import logo from './logo.svg';
@@ -162,7 +161,7 @@ function Platform({
     if (apiActive) return;
 
     // clear input, results, prompt
-    cleanPage();
+    clearPage();
 
     // query API status every second
     const interval = setInterval(() => {
@@ -188,6 +187,7 @@ function Platform({
           promptLeft={promptLeft}
           promptRight={promptRight}
           populatePrompt={getRandomPhrase}
+          clearPage={clearPage}
         />
 
         {/* <hr /> */}
@@ -234,9 +234,25 @@ function Platform({
     </div>
   );
 
-  function cleanPage() {
-    // clear input, input delta, results, prompt
-    clearInput(setInput, setInputDelta, setResults, setPrompt);
+  /**
+   * clear state related to: prompt, input, results
+   */
+  function clearPage() {
+    
+    // clear prompt-related fields
+    setPrompt("")
+    setPromptLeft("")
+    setPromptRight("");
+
+    // clear input-related fields
+    (document.getElementById("input") as HTMLInputElement).value = ""
+    setInput("")
+    setInputLeft("")
+    setInputRight("")
+    setInputDelta("")
+
+    // clear results
+    setResults([])
   }
 
   function handleOnInput(event: React.FormEvent<HTMLInputElement>) {
@@ -315,7 +331,7 @@ function Platform({
       updateAllMetrics(prompt, true);
 
       // clear page
-      cleanPage()
+      clearPage()
 
       // populate new prompt
       getRandomPhrase();

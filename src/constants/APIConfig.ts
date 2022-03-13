@@ -3,8 +3,9 @@ import { AxiosRequestConfig } from 'axios'
 export type apiConfigType = {
   apiVersion: string,
   host: string,
-  axiosGetConfigGenerator: (params: {}) => AxiosRequestConfig<string>,
-  axiosPostConfig: AxiosRequestConfig<string>
+  axiosGetConfigGenerator: (params?: {}) => AxiosRequestConfig<string>,
+  axiosPostConfig: AxiosRequestConfig<string>, 
+  axiosGetConfig: AxiosRequestConfig<string>
 }
 
 // API & Axios config
@@ -32,4 +33,5 @@ export const apiConfig: apiConfigType = {
   host: "https://mirrored-keyboard.herokuapp.com", 
   axiosGetConfigGenerator: axiosGetConfigGenerator,
   axiosPostConfig: axiosPostConfig,
+  axiosGetConfig: axiosGetConfigGenerator(),
 }

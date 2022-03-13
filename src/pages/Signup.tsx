@@ -26,8 +26,9 @@ function Signup() {
         {/* https://formik.org/docs/overview */}
         <Formik
           initialValues={{
-            age: undefined,
-            speed: undefined,
+            // as empty strings to fix issue: A component is changing an uncontrolled input of type text to be controlled
+            age: undefined || '',
+            speed: undefined || '',
           }}
           validate={(values) => {
             type errorsType = {
@@ -38,8 +39,18 @@ function Signup() {
               age: undefined,
               speed: undefined,
             }
-            const age: number | undefined = values.age
-            const speed: number | undefined = values.speed
+
+            if (typeof values.age === 'string') {
+              errors.age = "Age is required";
+              return errors;
+            }
+            if (typeof values.speed === 'string') {
+              errors.speed = "Typing speed is required";
+              return errors;
+            }
+
+            const age: number | undefined = values.age as number
+            const speed: number | undefined = values.speed as number
 
             // validate age
             if (!age) {
@@ -69,7 +80,10 @@ function Signup() {
             setTimeout(() => {
               // validate user-code on back-end
               signUp(
-                values,
+                {
+                  age: Number(values.age), 
+                  speed: Number(values.speed)
+                },
                 (response) => {
                   const userCode = response.data as string | null;
                   if (!userCode) {

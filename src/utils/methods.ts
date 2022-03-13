@@ -63,12 +63,3 @@ export function selectInputBox() {
 
     inputElement.focus();
 }
-
-export function clearInput(setInput: Function, setInputDelta: Function, setResults: Function, setPrompt: Function) {
-    (document.getElementById("input") as HTMLInputElement).value = ""
-    setPrompt("")
-    setInput("")
-    setInputDelta("")
-
-    setResults([])
-}

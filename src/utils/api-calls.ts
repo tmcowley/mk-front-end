@@ -10,11 +10,11 @@ export function queryServiceStatus(
     onSuccess: (response: AxiosResponse<any, any>) => void,
     onFail: (error: AxiosResponse<any, any>) => void
 ) {
-    const { apiVersion, host, axiosGetConfigGenerator } = apiConfig
+    const { apiVersion, host, axiosGetConfig } = apiConfig
     const path = apiVersion + "get-status";
     const url = host + path;
 
-    axios.get(url, axiosGetConfigGenerator({})).then(
+    axios.get(url, axiosGetConfig).then(
         (response) => {
             console.log(`${path} - response found: `)
             console.log(response)
@@ -63,11 +63,11 @@ export function getRandomPhrase(
     onSuccess: (response: AxiosResponse<any, any>) => void,
     onFail: (error: AxiosResponse<any, any>) => void
 ) {
-    const { apiVersion, host, axiosGetConfigGenerator } = apiConfig
+    const { apiVersion, host, axiosGetConfig } = apiConfig
     const path = apiVersion + "get-random-phrase";
     const url = host + path;
 
-    axios.get(url, axiosGetConfigGenerator({})).then(
+    axios.get(url, axiosGetConfig).then(
         (response) => {
             console.log(`${path} - response found: `)
             console.log(response)
