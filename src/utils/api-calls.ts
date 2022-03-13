@@ -1,6 +1,8 @@
 import axios, { AxiosResponse } from "axios";
 import { apiConfig } from '../constants/APIConfig'
 
+import { validateString } from '../utils/methods'
+
 enum Side {
     Left,
     Right,
@@ -34,6 +36,7 @@ export function submit(
     onFail: (error: AxiosResponse<any, any>) => void
 ) {
     if (input === "") return
+    if (!validateString(input)) return
 
     const { apiVersion, host, axiosGetConfigGenerator } = apiConfig
     const path = apiVersion + "submit"
@@ -104,6 +107,7 @@ function getSideEquivalent(
     onFail?: (error: AxiosResponse<any, any>) => void
 ) {
     if (str === "") return
+    if (!validateString(str)) return
 
     const { apiVersion, host, axiosGetConfigGenerator } = apiConfig
 

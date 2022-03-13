@@ -63,3 +63,17 @@ export function selectInputBox() {
 
     inputElement.focus();
 }
+
+export function validateString(str: string): boolean {
+
+    const whitelistArr = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!?.,-\' '.split('')
+    const whitelistSet = new Set(whitelistArr)
+
+    const isValid = str.split('').every((char) => { 
+        return whitelistSet.has(char) 
+    })
+
+    if (!isValid) console.log(`Error: string invalid: ${str}`)
+
+    return isValid
+}
