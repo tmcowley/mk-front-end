@@ -20,6 +20,7 @@ import {
 // import logo from './logo.svg';
 
 import {
+  isLoggedIn as APIisLoggedIn,
   queryServiceStatus as APIqueryServiceStatus,
   getRandomPhrase as APIgetRandomPhrase,
   submit as APIsubmit, 
@@ -27,11 +28,15 @@ import {
   getRightEquivalent as APIgetRightEquivalent
 } from "../utils/api-calls";
 
-function Platform({
-  loggedIn
-}: {loggedIn: boolean}) {
+// function Platform({
+//   loggedIn
+// }: {loggedIn: boolean}) {
+
+function Platform() {
 
   const navigate = useNavigate();
+
+  const [loggedIn, setLoggedIn] = useState(false);
 
   // text input and input delta (added characters)
   const [input, setInput] = useState("");
@@ -80,6 +85,12 @@ function Platform({
 
   // on page load
   useEffect(() => {
+    console.log("platform page loaded")
+    APIisLoggedIn((response) => {
+      setLoggedIn(response.data as boolean);
+      console.log("logged in:" + response.data)
+    });
+
     // query API active state
     queryServiceStatus();
 

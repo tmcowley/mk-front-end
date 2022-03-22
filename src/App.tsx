@@ -31,11 +31,8 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Platform loggedIn={loggedIn} />}></Route>
-
-        {/* <Route path="/about" element={<></>}></Route>
-
-        <Route path="/dashboard" element={<></>}></Route> */}
+        {/*         <Route path="/" element={<Platform loggedIn={loggedIn} />}></Route> */}
+        <Route path="/" element={<Platform/>}></Route>
 
         <Route path="/status" element={<Status />}></Route>
 
