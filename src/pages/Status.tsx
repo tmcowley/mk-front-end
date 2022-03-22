@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useLayoutEffect } from "react";
 
 import { queryServiceStatus, isLoggedIn } from "../utils/api-calls";
 import Sidebar from "../components/Sidebar";
@@ -7,18 +7,22 @@ function Status() {
   const [apiDown, setAPIDown] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
 
-  queryServiceStatus(
-    (response) => {
-      setAPIDown(false);
-    },
-    (error) => {
-      setAPIDown(true);
-    }
-  );
-
-  isLoggedIn((response) => {
-    setLoggedIn(response.data as boolean);
-  });
+  // fires before render
+  // see: https://reactjs.org/docs/hooks-reference.html#uselayouteffect
+  useLayoutEffect(() => {
+    queryServiceStatus(
+      (response) => {
+        setAPIDown(false);
+      },
+      (error) => {
+        setAPIDown(true);
+      }
+    );
+  
+    isLoggedIn((response) => {
+      setLoggedIn(response.data as boolean);
+    });
+  }, []);
 
   // function InactiveApiNotification() {
   //   return (

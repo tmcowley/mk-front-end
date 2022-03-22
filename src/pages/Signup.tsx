@@ -93,7 +93,7 @@ function Signup() {
                   else {
                     console.log("Notice: successful sign-up");
                     setSubmitting(true);
-                    navigate("/");
+                    navigate("/", { state: { test: "test" } });
                   }
                 },
                 (error) => {

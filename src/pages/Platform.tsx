@@ -85,7 +85,7 @@ function Platform() {
 
   // on page load
   useEffect(() => {
-    console.log("platform page loaded")
+    console.log("NOTICE: platform page loaded")
     APIisLoggedIn((response) => {
       setLoggedIn(response.data as boolean);
       console.log("logged in:" + response.data)
@@ -108,6 +108,12 @@ function Platform() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    console.log("NOTICE: after every render \n [w/ no args]")
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  });
+  
   useEffect(() => {
     // set prompt left and right forms
     APIgetLeftEquivalent(

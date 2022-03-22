@@ -18,8 +18,8 @@ export function queryServiceStatus(
 
     axios.get(url, axiosGetConfig).then(
         (response) => {
-            console.log(`${path} - response found: `)
-            console.log(response)
+            // console.log(`${path} - response found: `)
+            // console.log(response)
             onSuccess(response);
         },
         (error) => {
@@ -44,8 +44,8 @@ export function submit(
 
     axios.get(url, axiosGetConfigGenerator({ 'input': input })).then(
         (response) => {
-            console.log(`${path} - response found: `)
-            console.log(response)
+            // console.log(`${path} - response found: `)
+            // console.log(response)
             // let resultsArray = response.data as string[]
             onSuccess(response)
         },
@@ -72,8 +72,8 @@ export function getRandomPhrase(
 
     axios.get(url, axiosGetConfig).then(
         (response) => {
-            console.log(`${path} - response found: `)
-            console.log(response)
+            // console.log(`${path} - response found: `)
+            // console.log(response)
             onSuccess(response)
         },
         (error) => {
@@ -124,32 +124,9 @@ function getSideEquivalent(
 
     axios.get(url, axiosGetConfigGenerator({ 'input': str })).then(
         (response) => {
-            console.log(`${path} - response found: `);
-            console.log(response)
+            // console.log(`${path} - response found: `);
+            // console.log(response)
             // let equiv = response.data as string
-            onSuccess(response)
-        },
-        (error) => {
-            console.log(`${path} - error found: `)
-            console.log(error)
-            onFail?.(error)
-        }
-    );
-}
-
-export function signOut(
-    onSuccess: (response: AxiosResponse<any, any>) => void,
-    onFail?: (error: AxiosResponse<any, any>) => void
-) {
-    const { apiVersion, host, axiosPostConfig } = apiConfig
-    const path = apiVersion + "sign-out";
-    const url = host + path;
-    const data = null;
-
-    axios.post(url, data, axiosPostConfig).then(
-        (response) => {
-            console.log(`${path} - response found: `);
-            console.log(response)
             onSuccess(response)
         },
         (error) => {
@@ -176,6 +153,7 @@ export function signIn(
         (response) => {
             console.log(`${path} - response found: `);
             console.log(response)
+            // response.data.cookie
             onSuccess(response)
         },
         (error) => {
@@ -198,6 +176,29 @@ export function signUp(
     const path = apiVersion + "sign-up";
     const url = host + path;
     const data = JSON.stringify(formValues, null, 2)
+
+    axios.post(url, data, axiosPostConfig).then(
+        (response) => {
+            console.log(`${path} - response found: `);
+            console.log(response)
+            onSuccess(response)
+        },
+        (error) => {
+            console.log(`${path} - error found: `)
+            console.log(error)
+            onFail?.(error)
+        }
+    );
+}
+
+export function signOut(
+    onSuccess: (response: AxiosResponse<any, any>) => void,
+    onFail?: (error: AxiosResponse<any, any>) => void
+) {
+    const { apiVersion, host, axiosPostConfig } = apiConfig
+    const path = apiVersion + "sign-out";
+    const url = host + path;
+    const data = null;
 
     axios.post(url, data, axiosPostConfig).then(
         (response) => {
