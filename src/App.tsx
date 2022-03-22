@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+// import { useEffect, useState } from "react";
 
 // https://reactrouter.com/docs/en/v6/getting-started/tutorial
 import {
@@ -17,16 +17,16 @@ import Signout from "./pages/Signout";
 
 import "./styles/App.css";
 
-import { isLoggedIn as APIisLoggedIn } from "./utils/api-calls";
+// import { isLoggedIn as APIisLoggedIn } from "./utils/api-calls";
 
 function App() {
-  const [loggedIn, setLoggedIn] = useState(false);
+  // const [loggedIn, setLoggedIn] = useState(false);
 
-  useEffect(() => {
-    APIisLoggedIn((response) => {
-      setLoggedIn(response.data as boolean);
-    });
-  }, []);
+  // useEffect(() => {
+  //   APIisLoggedIn((response) => {
+  //     setLoggedIn(response.data as boolean);
+  //   });
+  // }, []);
 
   return (
     <Router>
