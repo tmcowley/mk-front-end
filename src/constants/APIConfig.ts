@@ -10,6 +10,7 @@ export type apiConfigType = {
 
 // API & Axios config
 const axiosPostConfig: AxiosRequestConfig<string> = {
+  withCredentials: true, 
   headers: {
     // 'Content-Length': 0,
     "Content-Type": "application/json",
