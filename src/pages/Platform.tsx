@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useLayoutEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 // import local components
@@ -84,7 +84,7 @@ function Platform() {
   // const [resultIndex, setResultIndex] = useState(null);
 
   // on page load
-  useEffect(() => {
+  useLayoutEffect(() => {
     console.log("NOTICE: platform page loaded")
     APIisLoggedIn((response) => {
       setLoggedIn(response.data as boolean);
@@ -108,12 +108,6 @@ function Platform() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    console.log("NOTICE: after every render \n [w/ no args]")
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  });
-  
   useEffect(() => {
     // set prompt left and right forms
     APIgetLeftEquivalent(
