@@ -1,7 +1,10 @@
 import axios, { AxiosResponse } from "axios";
+
 import { apiConfig } from '../constants/APIConfig'
 
 import { validateString } from '../utils/methods'
+
+// axios.defaults.withCredentials = true
 
 enum Side {
     Left,
