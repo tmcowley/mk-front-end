@@ -1,6 +1,7 @@
 import { selectInputBox } from "../utils/methods"
 
 type PromptProps = {
+  loggedIn: boolean;
   prompt: string;
   promptLeft: string;
   promptRight: string;
@@ -8,7 +9,7 @@ type PromptProps = {
   clearPage: Function;
 };
 
-function Prompt({ prompt, promptLeft, promptRight, populatePrompt, clearPage }: PromptProps) {
+function Prompt({ loggedIn, prompt, promptLeft, promptRight, populatePrompt, clearPage }: PromptProps) {
 
   return (
     <div id="promptText">
@@ -49,7 +50,7 @@ function Prompt({ prompt, promptLeft, promptRight, populatePrompt, clearPage }: 
     clearPage();
 
     // populate new prompt
-    populatePrompt();
+    populatePrompt(loggedIn);
 
     // focus input box
     selectInputBox();

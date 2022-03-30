@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from "axios";
 
-import { apiConfig } from '../constants/APIConfig'
+import { apiConfig } from '../constants/api-config'
 
 import { validateString } from '../utils/methods'
 
@@ -74,6 +74,29 @@ export function getRandomPhrase(
     const url = host + path;
 
     axios.get(url, axiosGetConfig).then(
+        (response) => {
+            // console.log(`${path} - response found: `)
+            // console.log(response)
+            onSuccess(response)
+        },
+        (error) => {
+            console.log(`${path} - error found: `)
+            console.log(error)
+            onFail(error)
+        }
+    );
+}
+
+export function getNextPhraseInSession(
+    onSuccess: (response: AxiosResponse<any, any>) => void,
+    onFail: (error: AxiosResponse<any, any>) => void
+) {
+    const { apiVersion, host, axiosPostConfig } = apiConfig
+    const path = apiVersion + "get-next-phrase";
+    const url = host + path;
+    const data = null
+
+    axios.post(url, data, axiosPostConfig).then(
         (response) => {
             // console.log(`${path} - response found: `)
             // console.log(response)
@@ -217,12 +240,12 @@ export function signOut(
     );
 }
 
-export function isLoggedIn(
+export function isSignedIn(
     onSuccess: (response: AxiosResponse<any, any>) => void,
     onFail?: (error: AxiosResponse<any, any>) => void
 ) {
     const { apiVersion, host, axiosPostConfig } = apiConfig
-    const path = apiVersion + "is-logged-in"
+    const path = apiVersion + "is-signed-in"
     const url = host + path
     const data = null
 

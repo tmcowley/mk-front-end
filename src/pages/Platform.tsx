@@ -20,12 +20,14 @@ import {
 // import logo from './logo.svg';
 
 import {
-  isLoggedIn as APIisLoggedIn,
+  isSignedIn as APIisLoggedIn,
   queryServiceStatus as APIqueryServiceStatus,
+  getNextPhraseInSession as APIgetNextPhraseInSession, 
   getRandomPhrase as APIgetRandomPhrase,
   submit as APIsubmit, 
   getLeftEquivalent as APIgetLeftEquivalent, 
-  getRightEquivalent as APIgetRightEquivalent
+  getRightEquivalent as APIgetRightEquivalent,
+  isSignedIn
 } from "../utils/api-calls";
 
 // function Platform({
@@ -94,6 +96,12 @@ function Platform() {
     // query API active state
     queryServiceStatus();
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // on page load
+  useEffect(() => {
+
     // start elapsed time
     // alert("resetting start time")
     setStartTime(performance.now());
@@ -102,7 +110,7 @@ function Platform() {
     setWpm(0);
 
     // populate prompt
-    getRandomPhrase();
+    getNextPhrase(loggedIn);
     selectInputBox();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -166,7 +174,7 @@ function Platform() {
     const emptyPrompt = prompt === "";
     if (emptyPrompt) {
       // if first time -> query text prompt
-      getRandomPhrase();
+      getNextPhrase(loggedIn);
 
       selectInputBox();
     }
@@ -208,10 +216,11 @@ function Platform() {
       <div id="content">
         {/* Sentence prompt */}
         <Prompt
+          loggedIn={loggedIn}
           prompt={prompt}
           promptLeft={promptLeft}
           promptRight={promptRight}
-          populatePrompt={getRandomPhrase}
+          populatePrompt={getNextPhrase}
           clearPage={clearPage}
         />
 
@@ -320,7 +329,7 @@ function Platform() {
       const correctChoice = (target?.value as string) === prompt;
       if (correctChoice) {
         console.log("correct choice");
-        handleCorrectChoice();
+        handleCorrectChoice(loggedIn);
       } else {
         console.log("wrong choice");
         handleIncorrectChoice();
@@ -346,7 +355,7 @@ function Platform() {
         console.log("5");
     }
 
-    function handleCorrectChoice() {
+    function handleCorrectChoice(loggedIn: boolean) {
       console.log("correct choice");
 
       // remove focus/ select
@@ -359,7 +368,7 @@ function Platform() {
       clearPage()
 
       // populate new prompt
-      getRandomPhrase();
+      getNextPhrase(loggedIn);
 
       // focus input box
       selectInputBox();
@@ -378,6 +387,9 @@ function Platform() {
   }
 
   function updateAllMetrics(prompt: string, correct: boolean) {
+
+    console.groupCollapsed("updating metrics");
+
     // recalculate wpm (true)
     {
       const msToMins = 1 / (Math.pow(10, 3) * 60);
@@ -417,6 +429,8 @@ function Platform() {
     // recalculate elapsedTime
     console.log("Notice: setting elapsedTime");
     setElapsedTime(performance.now() - startTime);
+
+    console.groupEnd();
   }
 
   // -----
@@ -435,7 +449,7 @@ function Platform() {
         clearPage();
 
         // navigate to status page
-        navigate("/status")
+        // navigate("/status")
       }
     );
   }
@@ -451,6 +465,28 @@ function Platform() {
       (error) => {
         setResults([]);
         // setComputed(false);
+        queryServiceStatus();
+      }
+    );
+  }
+
+  function getNextPhrase(loggedIn: boolean) {
+    if (loggedIn) {
+      console.log("Notice: Is logged in, getting next phrase in session")
+      getNextPhraseInSession()
+    } else {
+      getRandomPhrase()
+    }
+  }
+
+  function getNextPhraseInSession() {
+    return APIgetNextPhraseInSession(
+      (response) => {
+        let prompt = response.data as string;
+        prompt = prompt.toLowerCase();
+        setPrompt(prompt);
+      },
+      (error) => {
         queryServiceStatus();
       }
     );

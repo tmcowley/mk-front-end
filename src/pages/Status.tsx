@@ -1,6 +1,6 @@
 import { useState, useLayoutEffect } from "react";
 
-import { queryServiceStatus, isLoggedIn } from "../utils/api-calls";
+import { queryServiceStatus, isSignedIn } from "../utils/api-calls";
 import Sidebar from "../components/Sidebar";
 
 function Status() {
@@ -19,7 +19,7 @@ function Status() {
       }
     );
   
-    isLoggedIn((response) => {
+    isSignedIn((response) => {
       setLoggedIn(response.data as boolean);
     });
   }, []);
