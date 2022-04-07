@@ -1,4 +1,5 @@
 type FooterProps = {
+  loggedIn: boolean;
   prompt: string;
   inputDelta: string;
   input: string;
@@ -9,9 +10,13 @@ type FooterProps = {
   wpmTrue: number;
   errorRate: number;
   elapsedTime: number;
+  sessionNumber: number;
+  phraseNumber: number;
+  phrasesPerSession: number;
 };
 
 function Footer({
+    loggedIn,
   prompt,
   inputDelta,
   input,
@@ -21,6 +26,7 @@ function Footer({
   wpmTrue,
   errorRate,
   elapsedTime,
+    sessionNumber, phraseNumber, phrasesPerSession
 }: FooterProps) {
   return (
     <div id="footer" className="flexbox-container">
@@ -82,6 +88,17 @@ function Footer({
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <div
+          id="input-stats"
+          className="flexbox-item"
+          hidden={!loggedIn}
+      >
+        <h3 className="centre">Training Stats</h3>
+        <div className="centre">
+          Session {sessionNumber}, Phrase {phraseNumber} of {phrasesPerSession}
+        </div>
       </div>
 
       <div

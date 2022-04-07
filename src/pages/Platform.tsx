@@ -22,12 +22,15 @@ import {
 import {
   isSignedIn as APIisLoggedIn,
   queryServiceStatus as APIqueryServiceStatus,
-  getNextPhraseInSession as APIgetNextPhraseInSession, 
+  getNextPhraseInSession as APIgetNextPhraseInSession,
   getRandomPhrase as APIgetRandomPhrase,
-  submit as APIsubmit, 
-  getLeftEquivalent as APIgetLeftEquivalent, 
+  submit as APIsubmit,
+  getLeftEquivalent as APIgetLeftEquivalent,
   getRightEquivalent as APIgetRightEquivalent,
-  isSignedIn
+  getSessionNumber as APIgetSessionNumber,
+  getPhraseNumber as APIgetPhraseNumber,
+  getPhrasesPerSession as APIgetPhrasesPerSession,
+  reportCompletedTrainingSession as APIreportCompletedTrainingSession,
 } from "../utils/api-calls";
 
 // function Platform({
@@ -46,7 +49,7 @@ function Platform() {
   const [inputRight, setInputRight] = useState("");
   const [inputDelta, setInputDelta] = useState("");
 
-  // left and right hand side interpretations of input
+  // left and right-hand side interpretations of input
 
   // stores computed success state
   // const [computed, setComputed] = useState(false);
@@ -66,6 +69,11 @@ function Platform() {
   const [promptLeft, setPromptLeft] = useState("");
   const [promptRight, setPromptRight] = useState("");
 
+  const [sessionNumber, setSessionNumber] = useState<number | undefined>(undefined)
+  const [phraseNumber, setPhraseNumber] = useState<number | undefined>(undefined)
+
+  const [phrasesPerSession, setPhrasesPerSession] = useState<number | undefined>(undefined)
+
   // metrics:
 
   // TODO:
@@ -83,6 +91,9 @@ function Platform() {
 
   const [totalWordCount, setTotalWordCount] = useState(0);
 
+  const [reportCompletedTrainingSession, setReportCompletedTrainingSession] = useState(false)
+  const [newSession, setNewSession] = useState(false)
+
   // const [resultIndex, setResultIndex] = useState(null);
 
   // on page load
@@ -95,6 +106,13 @@ function Platform() {
 
     // query API active state
     queryServiceStatus();
+
+    // set phrases per session constant
+    APIgetPhrasesPerSession(
+        (response) => {
+          setPhrasesPerSession(response.data as number)
+        }
+    )
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -110,7 +128,7 @@ function Platform() {
     setWpm(0);
 
     // populate prompt
-    getNextPhrase(loggedIn);
+    getNextPhrase(loggedIn, phraseNumber as number, phrasesPerSession as number);
     selectInputBox();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -130,6 +148,8 @@ function Platform() {
         setPromptRight(response.data as string)
       }
     )
+
+    if (loggedIn) refreshTrainingDataNumbers()
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prompt]);
@@ -174,7 +194,7 @@ function Platform() {
     const emptyPrompt = prompt === "";
     if (emptyPrompt) {
       // if first time -> query text prompt
-      getNextPhrase(loggedIn);
+      getNextPhrase(loggedIn, phraseNumber as number, phrasesPerSession as number);
 
       selectInputBox();
     }
@@ -205,6 +225,50 @@ function Platform() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [apiActive]);
 
+  useLayoutEffect(() => {
+    // block active api state
+    if (!reportCompletedTrainingSession) return
+
+    // report completed training session
+    APIreportCompletedTrainingSession(
+        {
+          speed: wpmTrue, accuracy: (100-errorRate)
+        },
+        (response) => {
+          console.log("APIreportCompletedTrainingSession succeeded")
+        }
+    )
+
+    // reset metrics
+    resetMetrics()
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reportCompletedTrainingSession]);
+
+  useEffect(() => {
+    // block active api state
+    if (!reportCompletedTrainingSession) return
+
+    // update session and phrase numbers
+    refreshTrainingDataNumbers()
+
+    setNewSession(true)
+
+    setReportCompletedTrainingSession(false)
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reportCompletedTrainingSession]);
+
+  useLayoutEffect(() => {
+    // block not new session state
+    if (!newSession) return
+
+    // get new prompt
+    getNextPhrase(loggedIn, phraseNumber as number, phrasesPerSession as number)
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [newSession]);
+
   let target: PickerData | undefined;
 
   return (
@@ -223,9 +287,6 @@ function Platform() {
           populatePrompt={getNextPhrase}
           clearPage={clearPage}
         />
-
-        {/* <hr /> */}
-        <br />
 
         {/* Text input area (form) */}
         <TextInput
@@ -255,6 +316,7 @@ function Platform() {
         />
       </div>
       <Footer
+        loggedIn={loggedIn}
         prompt={prompt}
         inputDelta={inputDelta}
         input={input}
@@ -264,9 +326,25 @@ function Platform() {
         wpm={wpm}
         errorRate={errorRate}
         elapsedTime={elapsedTime}
+        sessionNumber={sessionNumber as number}
+        phraseNumber={phraseNumber as number}
+        phrasesPerSession={phrasesPerSession as number}
       />
     </div>
   );
+
+  function refreshTrainingDataNumbers() {
+    APIgetSessionNumber(
+        (response) => {
+          setSessionNumber(response.data as number)
+        }
+    )
+    APIgetPhraseNumber(
+        (response) => {
+          setPhraseNumber(response.data as number)
+        }
+    )
+  }
 
   /**
    * clear state related to: prompt, input, results
@@ -330,9 +408,11 @@ function Platform() {
       if (correctChoice) {
         console.log("correct choice");
         handleCorrectChoice(loggedIn);
+        removeKeydownListener();
       } else {
         console.log("wrong choice");
         handleIncorrectChoice();
+        removeKeydownListener();
       }
     }
 
@@ -368,7 +448,7 @@ function Platform() {
       clearPage()
 
       // populate new prompt
-      getNextPhrase(loggedIn);
+      getNextPhrase(loggedIn, phraseNumber as number, phrasesPerSession as number);
 
       // focus input box
       selectInputBox();
@@ -384,6 +464,14 @@ function Platform() {
 
       target = undefined;
     }
+  }
+
+  function resetMetrics() {
+    console.log("resetting metrics")
+    setWpmTrue(0)
+    setErrorRate(0)
+    setTotalWordCount(0)
+    setElapsedTime(0)
   }
 
   function updateAllMetrics(prompt: string, correct: boolean) {
@@ -470,25 +558,32 @@ function Platform() {
     );
   }
 
-  function getNextPhrase(loggedIn: boolean) {
+  function getNextPhrase(loggedIn: boolean, phraseNumber: number, phrasesPerSession: number) {
     if (loggedIn) {
-      console.log("Notice: Is logged in, getting next phrase in session")
-      getNextPhraseInSession()
+      const onLastPhraseInSession = (phraseNumber === phrasesPerSession)
+      if (onLastPhraseInSession) {
+        // report completed session
+        setReportCompletedTrainingSession(true)
+        return
+      }
+      getNextPhraseInTraining()
     } else {
       getRandomPhrase()
     }
   }
 
-  function getNextPhraseInSession() {
+  function getNextPhraseInTraining() {
+
+    console.log("Notice: Is logged in, getting next phrase in session")
     return APIgetNextPhraseInSession(
-      (response) => {
-        let prompt = response.data as string;
-        prompt = prompt.toLowerCase();
-        setPrompt(prompt);
-      },
-      (error) => {
-        queryServiceStatus();
-      }
+        (response) => {
+          let prompt = response.data as string;
+          prompt = prompt.toLowerCase();
+          setPrompt(prompt);
+        },
+        (error) => {
+          queryServiceStatus();
+        }
     );
   }
 

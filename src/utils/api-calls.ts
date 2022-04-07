@@ -2,7 +2,7 @@ import axios, { AxiosResponse } from "axios";
 
 import { apiConfig } from '../constants/api-config'
 
-import { validateString } from '../utils/methods'
+import { validateString } from './methods'
 
 // axios.defaults.withCredentials = true
 
@@ -12,31 +12,39 @@ enum Side {
 }
 
 export function queryServiceStatus(
-    onSuccess: (response: AxiosResponse<any, any>) => void,
-    onFail: (error: AxiosResponse<any, any>) => void
+    onSuccess: (response: AxiosResponse) => void,
+    onFail: (error: AxiosResponse) => void
 ) {
-    const { apiVersion, host, axiosGetConfig } = apiConfig
-    const path = apiVersion + "get-status";
-    const url = host + path;
-
-    axios.get(url, axiosGetConfig).then(
-        (response) => {
-            // console.log(`${path} - response found: `)
-            // console.log(response)
-            onSuccess(response);
-        },
+    getGetData(
+        "get-status",
+        onSuccess,
         (error) => {
-            console.log(`${path} - error found: `)
+            console.log(`get-status - error found: `)
             console.log(error)
             onFail(error)
         }
-    );
+    )
+}
+
+export function getPhrasesPerSession(
+    onSuccess: (response: AxiosResponse) => void,
+    onFail?: (error: AxiosResponse) => void
+) {
+    getGetData(
+        "get-phrases-per-session",
+        onSuccess,
+        (error) => {
+            console.log(`get-status - error found: `)
+            console.log(error)
+            onFail?.(error)
+        }
+    )
 }
 
 export function submit(
     input: string,
-    onSuccess: (response: AxiosResponse<any, any>) => void,
-    onFail: (error: AxiosResponse<any, any>) => void
+    onSuccess: (response: AxiosResponse) => void,
+    onFail: (error: AxiosResponse) => void
 ) {
     if (input === "") return
     if (!validateString(input)) return
@@ -66,8 +74,8 @@ export function submit(
  * @param onFail embedded into promise.then() error anon function
  */
 export function getRandomPhrase(
-    onSuccess: (response: AxiosResponse<any, any>) => void,
-    onFail: (error: AxiosResponse<any, any>) => void
+    onSuccess: (response: AxiosResponse) => void,
+    onFail: (error: AxiosResponse) => void
 ) {
     const { apiVersion, host, axiosGetConfig } = apiConfig
     const path = apiVersion + "get-random-phrase";
@@ -88,8 +96,8 @@ export function getRandomPhrase(
 }
 
 export function getNextPhraseInSession(
-    onSuccess: (response: AxiosResponse<any, any>) => void,
-    onFail: (error: AxiosResponse<any, any>) => void
+    onSuccess: (response: AxiosResponse) => void,
+    onFail: (error: AxiosResponse) => void
 ) {
     const { apiVersion, host, axiosPostConfig } = apiConfig
     const path = apiVersion + "get-next-phrase";
@@ -112,16 +120,16 @@ export function getNextPhraseInSession(
 
 export function getLeftEquivalent(
     str: string,
-    onSuccess: (error: AxiosResponse<any, any>) => void,
-    onFail?: (error: AxiosResponse<any, any>) => void
+    onSuccess: (error: AxiosResponse) => void,
+    onFail?: (error: AxiosResponse) => void
 ) {
     getSideEquivalent(Side.Left, str, onSuccess, onFail)
 }
 
 export function getRightEquivalent(
     str: string,
-    onSuccess: (error: AxiosResponse<any, any>) => void,
-    onFail?: (error: AxiosResponse<any, any>) => void
+    onSuccess: (error: AxiosResponse) => void,
+    onFail?: (error: AxiosResponse) => void
 ) {
     getSideEquivalent(Side.Right, str, onSuccess, onFail)
 }
@@ -129,8 +137,8 @@ export function getRightEquivalent(
 function getSideEquivalent(
     half: Side,
     str: string,
-    onSuccess: (response: AxiosResponse<any, any>) => void,
-    onFail?: (error: AxiosResponse<any, any>) => void
+    onSuccess: (response: AxiosResponse) => void,
+    onFail?: (error: AxiosResponse) => void
 ) {
     if (str === "") return
     if (!validateString(str)) return
@@ -165,8 +173,8 @@ function getSideEquivalent(
 
 export function signIn(
     formValues: { userCode: string },
-    onSuccess: (response: AxiosResponse<any, any>) => void,
-    onFail?: (error: AxiosResponse<any, any>) => void
+    onSuccess: (response: AxiosResponse) => void,
+    onFail?: (error: AxiosResponse) => void
 ) {
     if (!validateString(formValues.userCode)) return
 
@@ -191,17 +199,17 @@ export function signIn(
 }
 
 export function signUp(
-    formValues: {
+    form: {
         age: number | undefined,
         speed: number | undefined,
     },
-    onSuccess: (response: AxiosResponse<any, any>) => void,
-    onFail?: (error: AxiosResponse<any, any>) => void
+    onSuccess: (response: AxiosResponse) => void,
+    onFail?: (error: AxiosResponse) => void
 ) {
     const { apiVersion, host, axiosPostConfig } = apiConfig
     const path = apiVersion + "sign-up";
-    const url = host + path;
-    const data = JSON.stringify(formValues, null, 2)
+    const url = host + apiVersion + "sign-up";
+    const data = JSON.stringify(form, null, 2)
 
     axios.post(url, data, axiosPostConfig).then(
         (response) => {
@@ -218,46 +226,151 @@ export function signUp(
 }
 
 export function signOut(
-    onSuccess: (response: AxiosResponse<any, any>) => void,
-    onFail?: (error: AxiosResponse<any, any>) => void
+    onSuccess: (response: AxiosResponse) => void,
+    onFail?: (error: AxiosResponse) => void
 ) {
-    const { apiVersion, host, axiosPostConfig } = apiConfig
-    const path = apiVersion + "sign-out";
-    const url = host + path;
-    const data = null;
+    getPostData(
+        "sign-out",
+        onSuccess,
+        (error) => {
+            console.log(`sign-out - error found: `)
+            console.log(error)
+            onFail?.(error)
+        }
+    )
+}
 
-    axios.post(url, data, axiosPostConfig).then(
+export function isSignedIn(
+    onSuccess: (response: AxiosResponse) => void,
+    onFail?: (error: AxiosResponse) => void
+) {
+    getPostData(
+        "is-signed-in",
         (response) => {
-            console.log(`${path} - response found: `);
+            console.log(`is-signed-in - response found: `);
             console.log(response)
             onSuccess(response)
         },
         (error) => {
-            console.log(`${path} - error found: `)
+            console.log(`is-signed-in - error found: `)
             console.log(error)
             onFail?.(error)
+        }
+    )
+}
+
+export function getUserCode(
+    onSuccess: (response: AxiosResponse) => void,
+    onFail?: (error: AxiosResponse) => void
+) {
+    getPostData(
+        "get-user-code",
+        onSuccess,
+        onFail
+    )
+}
+
+export function getSessionNumber(
+    onSuccess: (response: AxiosResponse) => void,
+    onFail?: (error: AxiosResponse) => void
+) {
+    getPostData(
+        "get-session-number",
+        onSuccess,
+        onFail
+    )
+}
+
+export function getPhraseNumber(
+    onSuccess: (response: AxiosResponse) => void,
+    onFail?: (error: AxiosResponse) => void
+) {
+    getPostData(
+        "get-phrase-number",
+        onSuccess,
+        onFail
+    )
+}
+
+export function reportCompletedTrainingSession(
+    form: {
+        speed: number,
+        accuracy: number,
+    },
+    onSuccess?: (response: AxiosResponse) => void,
+    onFail?: (error: AxiosResponse) => void
+) {
+    const { apiVersion, host, axiosPostConfig } = apiConfig
+    const path = apiVersion + "report-completed-session";
+    const url = host + apiVersion + "report-completed-session";
+    const data = JSON.stringify(form, null, 2)
+
+    axios.post(url, data, axiosPostConfig).then(
+        (response) => {
+            // console.log(`${path} - response found: `);
+            // console.log(response)
+
+            const success = response.data as boolean
+
+            if (!success){
+                failing(response)
+                return
+            }
+
+            onSuccess?.(response)
+        },
+        failing
+    );
+
+    function failing(response: AxiosResponse) {
+        console.log(`${path} - error found: `)
+        console.log(response)
+        onFail?.(response)
+    }
+}
+
+function getGetData(
+    value: string,
+    onSuccess: (response: AxiosResponse) => void,
+    onFail: (error: AxiosResponse) => void
+) {
+    const { apiVersion, host, axiosGetConfig } = apiConfig
+    const path = apiVersion + value;
+    const url = host + path;
+
+    axios.get(url, axiosGetConfig).then(
+        (response) => {
+            // console.log(`${path} - response found: `)
+            // console.log(response)
+            onSuccess(response);
+        },
+        (error) => {
+            // console.log(`${path} - error found: `)
+            // console.log(error)
+            onFail(error)
         }
     );
 }
 
-export function isSignedIn(
-    onSuccess: (response: AxiosResponse<any, any>) => void,
-    onFail?: (error: AxiosResponse<any, any>) => void
+function getPostData(
+    value: string,
+    onSuccess: (response: AxiosResponse) => void,
+    onFail?: (error: AxiosResponse) => void
 ) {
     const { apiVersion, host, axiosPostConfig } = apiConfig
-    const path = apiVersion + "is-signed-in"
-    const url = host + path
+    const path = apiVersion + value;
+    const url = host + path;
     const data = null
 
     axios.post(url, data, axiosPostConfig).then(
         (response) => {
-            console.log(`${path} - response found: `);
-            console.log(response)
+            // console.log(`${path} - response found: `)
+            // console.log(response)
             onSuccess(response)
         },
         (error) => {
-            console.log(`${path} - error found: `)
-            console.log(error)
+            // console.log(`${path} - error found: `)
+            // console.log(error)
             onFail?.(error)
         }
     );

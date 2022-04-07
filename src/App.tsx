@@ -9,13 +9,14 @@ import {
 } from "react-router-dom";
 
 import Platform from "./pages/Platform";
-import Signin from "./pages/Signin";
-import Signup from "./pages/Signup";
+import SignIn from "./pages/SignIn";
+import SignUp from "./pages/SignUp";
 import Status from "./pages/Status";
 import Error from "./pages/Error";
-import Signout from "./pages/Signout";
+import SignOut from "./pages/SignOut";
 
 import "./styles/App.css";
+import DisplayCode from "./pages/DisplayCode";
 
 // import { isLoggedIn as APIisLoggedIn } from "./utils/api-calls";
 
@@ -36,11 +37,13 @@ function App() {
 
         <Route path="/status" element={<Status />}></Route>
 
-        <Route path="/sign-in" element={<Signin />}></Route>
+        <Route path="/display-user-code" element={<DisplayCode />}></Route>
 
-        <Route path="/sign-up" element={<Signup />}></Route>
+        <Route path="/sign-in" element={<SignIn />}></Route>
 
-        <Route path="/sign-out" element={<Signout />}></Route>
+        <Route path="/sign-up" element={<SignUp />}></Route>
+
+        <Route path="/sign-out" element={<SignOut />}></Route>
 
         {/* fallback path, maps 404 errors */}
         <Route path="*" element={<Error />}></Route>

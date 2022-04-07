@@ -1,4 +1,5 @@
 import { selectInputBox } from "../utils/methods"
+import React from "react";
 
 type PromptProps = {
   loggedIn: boolean;
@@ -13,21 +14,24 @@ function Prompt({ loggedIn, prompt, promptLeft, promptRight, populatePrompt, cle
 
   return (
     <div id="promptText">
+      <br hidden={!loggedIn}/>
       {/* "␣", "_", prompt.replaceAll(" ", "_") */}
       <p>{prompt === "" ? "Prompt goes here" : prompt}</p>
 
-      <button type="button" onClick={(_) => copyText(prompt)}>
-        Copy
-      </button>
-      <button type="button" onClick={(_) => copyText(promptLeft)}>
-        Copy LHS
-      </button>
-      <button type="button" onClick={(_) => copyText(promptRight)}>
-        Copy RHS
-      </button>
-      <button type="button" onClick={(_) => skipPrompt()}>
-        Skip
-      </button>
+        <div hidden={loggedIn}>
+          <button type="button" onClick={(_) => copyText(prompt)}>
+            Copy
+          </button>
+          <button type="button" onClick={(_) => copyText(promptLeft)}>
+            Copy LHS
+          </button>
+          <button type="button" onClick={(_) => copyText(promptRight)}>
+            Copy RHS
+          </button>
+          <button type="button" onClick={(_) => skipPrompt()}>
+            Skip
+          </button>
+        </div>
     </div>
   );
 

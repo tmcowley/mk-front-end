@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 
 import { signOut as APIsignOut } from '../utils/api-calls'
 
-function Signout() {
+function SignOut() {
   const navigate = useNavigate();
 
   setTimeout(() => {
@@ -16,4 +16,4 @@ function Signout() {
   return <h1 className="centre">Signing you out</h1>;
 }
 
-export default Signout;
+export default SignOut;

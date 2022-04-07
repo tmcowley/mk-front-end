@@ -12,7 +12,7 @@ import {
 
 import { signIn } from '../utils/api-calls'
 
-function Signin() {
+function SignIn() {
   const navigate = useNavigate();
 
   return (
@@ -124,4 +124,4 @@ function Signin() {
   );
 }
 
-export default Signin;
+export default SignIn;

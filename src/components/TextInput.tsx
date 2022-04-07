@@ -19,6 +19,7 @@ function TextInput({
   addKeydownListener,
 }: TextInputProps) {
   return (
+      <>
     <form
       onSubmit={(e) => handleFormSubmit(e)}
       onKeyDown={(e) => handleKeyDown(e)}
@@ -36,6 +37,7 @@ function TextInput({
         />
       </label>
     </form>
+      </>
   );
 
   function handleFormSubmit(event: React.FormEvent) {

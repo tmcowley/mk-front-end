@@ -6,7 +6,7 @@ import { useNavigate, Link } from "react-router-dom";
 
 import { signUp } from "../utils/api-calls";
 
-function Signup() {
+function SignUp() {
   const navigate = useNavigate();
 
   return (
@@ -27,8 +27,8 @@ function Signup() {
         <Formik
           initialValues={{
             // as empty strings to fix issue: A component is changing an uncontrolled input of type text to be controlled
-            age: undefined || '',
-            speed: undefined || '',
+            age: '',
+            speed: '',
           }}
           validate={(values) => {
             type errorsType = {
@@ -138,6 +138,7 @@ function Signup() {
               <button type="submit" disabled={isSubmitting}>
                 Sign-up
               </button>
+
             </Form>
           )}
         </Formik>
@@ -146,4 +147,4 @@ function Signup() {
   );
 }
 
-export default Signup;
+export default SignUp;
