@@ -28,7 +28,7 @@ export function queryServiceStatus(
 
 export function getPhrasesPerSession(
     onSuccess: (response: AxiosResponse) => void,
-    onFail?: (error: AxiosResponse) => void
+    onFail?: (error?: AxiosResponse) => void
 ) {
     getGetData(
         "get-phrases-per-session",

@@ -16,7 +16,7 @@ function Prompt({ loggedIn, prompt, promptLeft, promptRight, populatePrompt, cle
     <div id="promptText">
       <br hidden={!loggedIn}/>
       {/* "␣", "_", prompt.replaceAll(" ", "_") */}
-      <p>{prompt === "" ? "Prompt goes here" : prompt}</p>
+      <p className="boldText">{prompt === "" ? "Prompt goes here" : prompt}</p>
 
         <div hidden={loggedIn}>
           <button type="button" onClick={(_) => copyText(prompt)}>

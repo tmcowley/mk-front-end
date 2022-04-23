@@ -1,23 +1,23 @@
-import React, { useState, useEffect, useLayoutEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useLayoutEffect } from "react"
+import { useNavigate } from "react-router-dom"
 
 // import local components
-import Footer from "../components/Footer";
-import Header from "../components/Header";
-import Prompt from "../components/Prompt";
-import TextInput from "../components/TextInput";
-import SentenceSelector from "../components/SentenceSelector";
+import Footer from "../components/Footer"
+import Header from "../components/Header"
+import Prompt from "../components/Prompt"
+import TextInput from "../components/TextInput"
+import SentenceSelector from "../components/SentenceSelector"
 
 // see: https://www.npmjs.com/package/react-simple-wheel-picker
-import { PickerData } from "react-simple-wheel-picker";
+import { PickerData } from "react-simple-wheel-picker"
 
 import {
   getStringDelta,
   countWords,
   selectInputBox,
-} from "../utils/methods";
+} from "../utils/methods"
 
-// import logo from './logo.svg';
+// import logo from './logo.svg'
 
 import {
   isSignedIn as APIisLoggedIn,
@@ -31,7 +31,8 @@ import {
   getPhraseNumber as APIgetPhraseNumber,
   getPhrasesPerSession as APIgetPhrasesPerSession,
   reportCompletedTrainingSession as APIreportCompletedTrainingSession,
-} from "../utils/api-calls";
+} from "../utils/api-calls"
+import {rightSide} from "../constants/constants"
 
 // function Platform({
 //   loggedIn
@@ -39,35 +40,35 @@ import {
 
 function Platform() {
 
-  // const navigate = useNavigate();
+  const navigate = useNavigate()
 
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false)
 
   // text input and input delta (added characters)
-  const [input, setInput] = useState("");
-  const [inputLeft, setInputLeft] = useState("");
-  const [inputRight, setInputRight] = useState("");
-  const [inputDelta, setInputDelta] = useState("");
+  const [input, setInput] = useState("")
+  const [inputLeft, setInputLeft] = useState("")
+  const [inputRight, setInputRight] = useState("")
+  const [inputDelta, setInputDelta] = useState("")
 
   // left and right-hand side interpretations of input
 
   // stores computed success state
-  // const [computed, setComputed] = useState(false);
+  // const [computed, setComputed] = useState(false)
 
   // stores sentence results
-  const [results, setResults] = useState([] as string[]);
+  const [results, setResults] = useState([] as string[])
 
-  // const [target, setTarget] = useState<PickerData | undefined>();
-  // const [targetId, setTargetId] = useState<number | undefined>();
-  // const [targetValue, setTargetValue] = useState<string | undefined>();
+  // const [target, setTarget] = useState<PickerData | undefined>()
+  // const [targetId, setTargetId] = useState<number | undefined>()
+  // const [targetValue, setTargetValue] = useState<string | undefined>()
 
   // stores API active state
-  const [apiActive, setApiActive] = useState(false);
+  const [apiActive, setApiActive] = useState(false)
 
   // stores text prompt
-  const [prompt, setPrompt] = useState("");
-  const [promptLeft, setPromptLeft] = useState("");
-  const [promptRight, setPromptRight] = useState("");
+  const [prompt, setPrompt] = useState("")
+  const [promptLeft, setPromptLeft] = useState("")
+  const [promptRight, setPromptRight] = useState("")
 
   const [sessionNumber, setSessionNumber] = useState<number | undefined>(undefined)
   const [phraseNumber, setPhraseNumber] = useState<number | undefined>(undefined)
@@ -78,34 +79,34 @@ function Platform() {
 
   // TODO:
   // stores wpm history, error rate history, elapsed times
-  // const [metricHistory, setMetricHistory] = useState({});
+  // const [metricHistory, setMetricHistory] = useState({})
 
   // elapsed time
-  const [startTime, setStartTime] = useState(0);
-  const [elapsedTime, setElapsedTime] = useState(0);
+  const [startTime, setStartTime] = useState(0)
+  const [elapsedTime, setElapsedTime] = useState(0)
 
-  const [wpm, setWpm] = useState(0);
-  const [wpmTrue, setWpmTrue] = useState(0);
+  const [wpm, setWpm] = useState(0)
+  const [wpmTrue, setWpmTrue] = useState(0)
 
-  const [errorRate, setErrorRate] = useState(0);
+  const [errorRate, setErrorRate] = useState(0)
 
-  const [totalWordCount, setTotalWordCount] = useState(0);
+  const [totalWordCount, setTotalWordCount] = useState(0)
 
   const [reportCompletedTrainingSession, setReportCompletedTrainingSession] = useState(false)
   // const [newSession, setNewSession] = useState(false)
 
-  // const [resultIndex, setResultIndex] = useState(null);
+  // const [resultIndex, setResultIndex] = useState(null)
 
   // on page load
   useLayoutEffect(() => {
     console.log("NOTICE: platform page loaded")
     APIisLoggedIn((response) => {
-      setLoggedIn(response.data as boolean);
+      setLoggedIn(response.data as boolean)
       console.log("logged in:" + response.data)
-    });
+    })
 
     // query API active state
-    queryServiceStatus();
+    queryServiceStatus()
 
     // set phrases per session constant
     APIgetPhrasesPerSession(
@@ -115,24 +116,29 @@ function Platform() {
     )
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [])
 
   // on page load
   useEffect(() => {
 
     // start elapsed time
     // alert("resetting start time")
-    setStartTime(performance.now());
+    setStartTime(performance.now())
 
     // TODO: calculate non-selection wpm:
-    setWpm(0);
+    setWpm(0)
 
     // populate prompt
-    getNextPhrase(loggedIn, phraseNumber as number, phrasesPerSession as number);
-    selectInputBox();
+    getNextPhrase(loggedIn, phraseNumber as number, phrasesPerSession as number)
+    selectInputBox()
+
+    // refresh elapsed time every half-second
+    setInterval(() => {
+      setElapsedTime(performance.now() - startTime)
+    }, 500)
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [])
 
   useEffect(() => {
     // set prompt left and right forms
@@ -152,12 +158,12 @@ function Platform() {
     if (loggedIn) refreshTrainingDataNumbers()
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [prompt]);
+  }, [prompt])
 
   // on update of input => update stats, results
   useEffect(() => {
     // update metric: elapsed time
-    setElapsedTime(performance.now() - startTime);
+    setElapsedTime(performance.now() - startTime)
 
     if (input === "") {
       setInputLeft("")
@@ -181,49 +187,49 @@ function Platform() {
     )
 
     // submit to get results
-    submit(input);
+    submit(input)
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [input]);
+  }, [input])
 
   // when the API becomes active
   useEffect(() => {
     // block inactive api state
-    if (!apiActive) return;
+    if (!apiActive) return
 
-    const emptyPrompt = prompt === "";
+    const emptyPrompt = prompt === ""
     if (emptyPrompt) {
       // if first time -> query text prompt
-      getNextPhrase(loggedIn, phraseNumber as number, phrasesPerSession as number);
+      getNextPhrase(loggedIn, phraseNumber as number, phrasesPerSession as number)
 
-      selectInputBox();
+      selectInputBox()
     }
 
     // focus-on and select input box
-    selectInputBox();
+    selectInputBox()
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [apiActive]);
+  }, [apiActive])
 
   // when the API becomes inactive
   useEffect(() => {
     // block active api state
-    if (apiActive) return;
+    if (apiActive) return
 
-    // // clear input, results, prompt
-    // clearPage();
+    // clear input, results, prompt
+    // clearPage()
 
-    // // navigate to status page
+    // navigate to status page
     // navigate("/status")
 
     // query API status every second
     const interval = setInterval(() => {
-      queryServiceStatus();
-    }, 1000);
-    return () => clearInterval(interval);
+      queryServiceStatus()
+    }, 1000)
+    return () => clearInterval(interval)
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [apiActive]);
+  }, [apiActive])
 
   useEffect(() => {
     // block active api state
@@ -235,7 +241,7 @@ function Platform() {
           speed: wpmTrue,
           accuracy: (100 - errorRate)
         },
-        (response) => {
+        () => {
           console.log("APIreportCompletedTrainingSession succeeded")
 
           // reset metrics
@@ -243,18 +249,26 @@ function Platform() {
 
           // update session and phrase numbers
           refreshTrainingDataNumbers()
-
-          console.log("\n\nnewSession hook called\n\n")
-
-          // get new prompt
-          getNextPhrase(loggedIn, phraseNumber as number, phrasesPerSession as number)
-
-          setReportCompletedTrainingSession(false)
         }
     )
 
+    setReportCompletedTrainingSession(false)
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reportCompletedTrainingSession]);
+  }, [reportCompletedTrainingSession])
+
+  useEffect(() => {
+    // block non-initial phrases
+    if (phraseNumber !== 0) return
+
+    // populate prompt
+    console.log("\n\ninitial phrase detected -> call next phrase\n\n")
+
+    // get new prompt
+    getNextPhrase(loggedIn, phraseNumber as number, phrasesPerSession as number)
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phraseNumber])
 
   // useEffect(() => {
   //   // block not new session state
@@ -266,9 +280,9 @@ function Platform() {
   //   getNextPhrase(loggedIn, phraseNumber as number, phrasesPerSession as number)
   //
   //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [newSession]);
+  // }, [newSession])
 
-  let target: PickerData | undefined;
+  let target: PickerData | undefined
 
   return (
     <div className="App" id="App">
@@ -309,8 +323,8 @@ function Platform() {
             target = {
               id: targetArg.id,
               value: (targetArg.value as string).slice(4),
-            };
-            addKeydownListener();
+            }
+            addKeydownListener()
           }}
         />
       </div>
@@ -330,17 +344,18 @@ function Platform() {
         phrasesPerSession={phrasesPerSession as number}
       />
     </div>
-  );
+  )
 
   function refreshTrainingDataNumbers() {
     APIgetSessionNumber(
         (response) => {
           setSessionNumber(response.data as number)
-        }
-    )
-    APIgetPhraseNumber(
-        (response) => {
-          setPhraseNumber(response.data as number)
+
+          APIgetPhraseNumber(
+              (response) => {
+                setPhraseNumber(response.data as number)
+              }
+          )
         }
     )
   }
@@ -353,10 +368,11 @@ function Platform() {
     // clear prompt-related fields
     setPrompt("")
     setPromptLeft("")
-    setPromptRight("");
+    setPromptRight("")
 
     // clear input-related fields
-    (document.getElementById("input") as HTMLInputElement).value = ""
+    const inputEl = (document.getElementById("input") as HTMLInputElement)
+    if (inputEl !== null && inputEl !== undefined) inputEl.value = ""
     setInput("")
     setInputLeft("")
     setInputRight("")
@@ -367,32 +383,42 @@ function Platform() {
   }
 
   function handleOnInput(event: React.FormEvent<HTMLInputElement>) {
-    queryServiceStatus();
+    queryServiceStatus()
 
-    const oldValue = input;
-    const inputElement = event.target as HTMLInputElement;
-    const newValue = inputElement.value;
-    const selectionEnd = inputElement.selectionEnd!;
-
-    // update the state-stored input
-    setInput(newValue);
+    const oldValue = input
+    const inputElement = event.target as HTMLInputElement
+    const newValue = inputElement.value
+    const selectionEnd = inputElement.selectionEnd!
 
     // calculate the input delta (new characters)
-    const inputDelta = getStringDelta(oldValue, newValue, selectionEnd);
-    setInputDelta(inputDelta);
+    const inputDelta = getStringDelta(oldValue, newValue, selectionEnd)
+
+    // restrict keyboard sides
+    const restrictRightSide = false
+    const side = rightSide
+    const characterOnRight = (element: string) => {
+      return side.has(element)
+    }
+    const usesRightSide = inputDelta.split("").some(characterOnRight)
+    if (restrictRightSide && loggedIn && usesRightSide) return
+
+    setInputDelta(inputDelta)
+
+    // update the state-stored input
+    setInput(newValue)
   }
 
   function addKeydownListener() {
     removeKeydownListener();
     (
       document.getElementById("wheelPicker") as HTMLUListElement
-    )?.addEventListener("keydown", handleKeydown);
+    )?.addEventListener("keydown", handleKeydown)
   }
 
   function removeKeydownListener() {
     (
       document.getElementById("wheelPicker") as HTMLUListElement
-    )?.removeEventListener("keydown", handleKeydown);
+    )?.removeEventListener("keydown", handleKeydown)
   }
 
   function handleKeydown(e: KeyboardEvent) {
@@ -400,10 +426,10 @@ function Platform() {
 
     // listen for enter key
     if (e.key === "Enter") {
-      console.log("enter detected");
+      console.log("enter detected")
 
       // check if chosen sentence matches prompt
-      const correctChoice = (target?.value as string) === prompt;
+      const correctChoice = (target?.value as string) === prompt
       if (correctChoice) {
         console.log("correct choice")
         handleCorrectChoice(loggedIn)
@@ -418,52 +444,59 @@ function Platform() {
     // ...
     switch (e.key) {
       case "1":
-        console.log("1");
-        break;
+        console.log("1")
+        break
       case "2":
-        console.log("2");
-        break;
+        console.log("2")
+        break
       case "3":
-        console.log("3");
-        break;
+        console.log("3")
+        break
       case "4":
-        console.log("4");
-        break;
+        console.log("4")
+        break
       case "5":
-        console.log("5");
+        console.log("5")
+    }
+
+    function removeKeydownListener() {
+      (
+          document.getElementById("wheelPicker") as HTMLUListElement
+      )?.removeEventListener("keydown", handleKeydown)
     }
 
     function handleCorrectChoice(loggedIn: boolean) {
       console.log("correct choice");
 
       // remove focus/ select
-      (document.activeElement as HTMLLIElement).blur();
+      (document.activeElement as HTMLLIElement).blur()
 
       // update metrics
-      updateAllMetrics(prompt, true);
+      updateAllMetrics(prompt, true)
 
       // clear page
       clearPage()
 
       // populate new prompt
-      getNextPhrase(loggedIn, phraseNumber as number, phrasesPerSession as number);
+      getNextPhrase(loggedIn, phraseNumber as number, phrasesPerSession as number)
 
       // focus input box
-      selectInputBox();
+      selectInputBox()
 
-      target = undefined;
+      target = undefined
 
-      removeKeydownListener();
+      removeKeydownListener()
     }
 
     function handleIncorrectChoice() {
       // update metrics
-      updateAllMetrics(prompt, false);
+      updateAllMetrics(prompt, false)
 
-      target = undefined;
+      target = undefined
     }
   }
 
+  /** reset all metrics */
   function resetMetrics() {
     console.log("resetting metrics")
     setWpmTrue(0)
@@ -474,88 +507,91 @@ function Platform() {
 
   function updateAllMetrics(prompt: string, correct: boolean) {
 
-    console.groupCollapsed("updating metrics");
+    console.groupCollapsed("updating metrics")
 
     // recalculate wpm (true)
     {
-      const msToMins = 1 / (Math.pow(10, 3) * 60);
+      const msToMinutes = 1 / (Math.pow(10, 3) * 60)
 
       // get number of correct words
-      let elapsedTimeMins = elapsedTime * msToMins;
-      console.log("elapsed mins (not updated): " + elapsedTimeMins);
-      let correctWordsCount = wpmTrue * elapsedTimeMins;
-      console.log("correct words count: " + correctWordsCount);
+      let elapsedTimeMinutes = elapsedTime * msToMinutes
+      console.log("elapsed minutes (not updated): " + elapsedTimeMinutes)
+      let correctWordsCount = wpmTrue * elapsedTimeMinutes
+      console.log("correct words count: " + correctWordsCount)
 
-      elapsedTimeMins = (performance.now() - startTime) * msToMins;
-      console.log("elapsed mins (updated): " + elapsedTimeMins);
+      elapsedTimeMinutes = (performance.now() - startTime) * msToMinutes
+      console.log("elapsed minutes (updated): " + elapsedTimeMinutes)
 
-      if (correct) correctWordsCount += countWords(prompt);
+      if (correct) correctWordsCount += countWords(prompt)
 
-      console.log("Notice: setting wpmTrue");
-      setWpmTrue(correctWordsCount / elapsedTimeMins);
+      console.log("Notice: setting wpmTrue")
+      setWpmTrue(correctWordsCount / elapsedTimeMinutes)
     }
 
     // recalculate error rates
     {
-      let totalWordCountLocal = totalWordCount;
-      let errorCount = (errorRate / 100) * totalWordCountLocal;
+      let totalWordCountLocal = totalWordCount
+      let errorCount = (errorRate / 100) * totalWordCountLocal
 
-      totalWordCountLocal += countWords(prompt);
+      totalWordCountLocal += countWords(prompt)
 
-      if (!correct) errorCount += countWords(prompt);
+      if (!correct) errorCount += countWords(prompt)
 
-      console.log("Notice: setting error rate");
-      setErrorRate((errorCount / totalWordCountLocal) * 100);
+      console.log("Notice: setting error rate")
+      setErrorRate((errorCount / totalWordCountLocal) * 100)
     }
 
     // recalculate totalWordCount
-    console.log("Notice: setting totalWordCount");
-    setTotalWordCount(totalWordCount + countWords(prompt));
+    console.log("Notice: setting totalWordCount")
+    setTotalWordCount(totalWordCount + countWords(prompt))
 
     // recalculate elapsedTime
-    console.log("Notice: setting elapsedTime");
-    setElapsedTime(performance.now() - startTime);
+    console.log("Notice: setting elapsedTime")
+    setElapsedTime(performance.now() - startTime)
 
-    console.groupEnd();
+    console.groupEnd()
   }
 
   // -----
   // API calls
   // -----
 
+  /** query the api state */
   function queryServiceStatus() {
     APIqueryServiceStatus(
-      (response) => {
-        setApiActive(true);
+      () => {
+        setApiActive(true)
       },
-      (error) => {
-        setApiActive(false);
+      () => {
+        setApiActive(false)
         
         // clear input, results, prompt
-        clearPage();
+        clearPage()
 
         // navigate to status page
-        // navigate("/status")
+        navigate("/status")
       }
-    );
+    )
   }
 
+  /** submit an input sentence */
   function submit(input: string) {
     APIsubmit(
       input,
       (response) => {
-        const resultsArray = response.data as string[];
-        setResults(resultsArray);
-        // setComputed(true);
+        const resultsArray = response.data as string[]
+        setResults(resultsArray)
+        // setComputed(true)
       },
-      (error) => {
-        setResults([]);
-        // setComputed(false);
-        queryServiceStatus();
+      () => {
+        setResults([])
+        // setComputed(false)
+        queryServiceStatus()
       }
-    );
+    )
   }
 
+  /** get the next phrase, chooses between next training phrase and a random one based on log-in state */
   function getNextPhrase(loggedIn: boolean, phraseNumber: number, phrasesPerSession: number) {
     if (loggedIn) {
       const onLastPhraseInSession = (phraseNumber === phrasesPerSession)
@@ -575,28 +611,29 @@ function Platform() {
     console.log("Notice: Is logged in, getting next phrase in session")
     return APIgetNextPhraseInSession(
         (response) => {
-          let prompt = response.data as string;
-          prompt = prompt.toLowerCase();
-          setPrompt(prompt);
+          let prompt = response.data as string
+          prompt = prompt.toLowerCase()
+          setPrompt(prompt)
         },
-        (error) => {
-          queryServiceStatus();
+        () => {
+          queryServiceStatus()
         }
-    );
+    )
   }
 
+  /** get a random phrase (for demonstration page) */
   function getRandomPhrase() {
     return APIgetRandomPhrase(
       (response) => {
-        let prompt = response.data as string;
-        prompt = prompt.toLowerCase();
-        setPrompt(prompt);
+        let prompt = response.data as string
+        prompt = prompt.toLowerCase()
+        setPrompt(prompt)
       },
-      (error) => {
-        queryServiceStatus();
+      () => {
+        queryServiceStatus()
       }
-    );
+    )
   }
 }
 
-export default Platform;
+export default Platform

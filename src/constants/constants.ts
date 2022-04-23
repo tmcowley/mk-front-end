@@ -1,4 +1,16 @@
 
+// keyboard-sides key sets
+export const leftSide = new Set([
+    'q', 'w', 'e', 'r', 't',
+    'a', 's', 'd', 'f', 'g',
+    'z', 'x', 'c', 'v', 'b'
+])
+export const rightSide = new Set([
+    'y', 'u', 'i', 'o', 'p',
+    'h', 'j', 'k', 'l',
+    'n', 'm'
+])
+
 // source: https://github.com/negomi/react-burger-menu
 export var styles = {
     bmBurgerButton: {

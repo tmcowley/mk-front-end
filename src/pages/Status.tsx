@@ -1,36 +1,40 @@
-import { useState, useLayoutEffect } from "react";
+import {useState, useLayoutEffect, useEffect} from "react";
 
-import { queryServiceStatus, isSignedIn } from "../utils/api-calls";
+import { queryServiceStatus as APIqueryServiceStatus, isSignedIn } from "../utils/api-calls";
 import Sidebar from "../components/Sidebar";
 
 function Status() {
-  const [apiDown, setAPIDown] = useState(false);
+  const [apiDown, setAPIDown] = useState(true);
   const [loggedIn, setLoggedIn] = useState(false);
 
   // fires before render
   // see: https://reactjs.org/docs/hooks-reference.html#uselayouteffect
   useLayoutEffect(() => {
-    queryServiceStatus(
-      (response) => {
-        setAPIDown(false);
-      },
-      (error) => {
-        setAPIDown(true);
-      }
-    );
-  
+    queryServiceStatus()
+
     isSignedIn((response) => {
       setLoggedIn(response.data as boolean);
     });
   }, []);
 
-  // function InactiveApiNotification() {
-  //   return (
-  //     <div id="inactiveNotification">
-  //       Back-end services are inactive - apologies for any inconvenience
-  //     </div>
-  //   );
-  // }
+  useEffect(() => {
+    // query API status every second
+    setInterval(() => {
+      queryServiceStatus()
+    }, 1000)
+  }, [])
+
+  // query the api state
+  function queryServiceStatus() {
+    APIqueryServiceStatus(
+        () => {
+          setAPIDown(false)
+        },
+        () => {
+          setAPIDown(true)
+        }
+    );
+  }
 
   return (
     <div className="App" id="App">
@@ -50,10 +54,16 @@ function Status() {
           
           <h3 className="centre" hidden={apiDown}>
             Back-end services operational
+
+            <br /><br /><br /><br />
+
+            <a className="page-link" href="/">
+              Return Home
+            </a>
           </h3>
           <h3 className="centre" hidden={!apiDown}>
-            Back-end services are inactive <br /> 
-            apologies for any inconvenience
+            Back-end services are inactive. <br />
+            Apologies for any inconvenience.
           </h3>
         </div>
       </div>

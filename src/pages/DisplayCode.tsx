@@ -52,7 +52,8 @@ function DisplayCode() {
           </h3>
 
           <br /><br />
-          Please make a note of this! It's used when signing into your account.
+          Please make a note of this! <br />
+          It is used to sign into your account.
           <br /><br /><br /><br />
 
           <a className="page-link" href="/">
