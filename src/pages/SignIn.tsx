@@ -23,7 +23,7 @@ function SignIn() {
           Please sign-in with your user-code <br />
           (of the form "word-word-word") <br />
           <br />
-          Alternatively, <Link to="/sign-up">Sign-up</Link> or <Link to="/">Return Home</Link>
+          Alternatively, <Link className="link" to="/sign-up">Sign-up</Link> or <Link className="link" to="/">Return Home</Link>
         </p>
 
         <br />
@@ -43,7 +43,7 @@ function SignIn() {
               errors.userCode = "user-code is required";
             } else if ((userCode as string).length !== 5 + 1 + 5 + 1 + 5) {
               errors.userCode = "user-code invalid";
-            } else if (true) {
+            } else {
               const userCodeSplit: string[] = (userCode as string).split("-");
 
               if (userCodeSplit.length !== 3) {

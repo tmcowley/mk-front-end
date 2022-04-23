@@ -1,4 +1,4 @@
-import {useState, useLayoutEffect, useEffect} from "react";
+import {useState, useLayoutEffect} from "react";
 
 import {
   isSignedIn as APIisSignedIn,
@@ -20,7 +20,6 @@ function DisplayCode() {
   }, []);
 
   useLayoutEffect(() => {
-
     if (!loggedIn) return
 
     // query user-code
@@ -41,11 +40,30 @@ function DisplayCode() {
 
       <div id="content">
         <div id="statusInfo">
-          <h1 className="centre">Your User Code...</h1>
+          <h1 className="centre">Your User Code</h1>
+
+          <br />
+          <h3>
+            {
+              userCode === ""
+                  ? "Please sign-in to receive a user-code!"
+                  : userCode
+            }
+          </h3>
 
           <br /><br />
-          
-          <h3> {userCode === "" ? "User code goes here" : userCode} </h3>
+          Please make a note of this! It's used when signing into your account.
+          <br /><br /><br /><br />
+
+          <a className="page-link" href="/">
+          {
+            userCode === ""
+                ? "Return to the Demonstration Page"
+                : "Enter the Learning Platform"
+          }
+          </a>
+
+          <br /><br />
         </div>
       </div>
     </div>

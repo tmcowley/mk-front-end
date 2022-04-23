@@ -39,7 +39,7 @@ import {
 
 function Platform() {
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const [loggedIn, setLoggedIn] = useState(false);
 
@@ -92,7 +92,7 @@ function Platform() {
   const [totalWordCount, setTotalWordCount] = useState(0);
 
   const [reportCompletedTrainingSession, setReportCompletedTrainingSession] = useState(false)
-  const [newSession, setNewSession] = useState(false)
+  // const [newSession, setNewSession] = useState(false)
 
   // const [resultIndex, setResultIndex] = useState(null);
 
@@ -225,49 +225,48 @@ function Platform() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [apiActive]);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     // block active api state
     if (!reportCompletedTrainingSession) return
 
     // report completed training session
     APIreportCompletedTrainingSession(
         {
-          speed: wpmTrue, accuracy: (100-errorRate)
+          speed: wpmTrue,
+          accuracy: (100 - errorRate)
         },
         (response) => {
           console.log("APIreportCompletedTrainingSession succeeded")
+
+          // reset metrics
+          resetMetrics()
+
+          // update session and phrase numbers
+          refreshTrainingDataNumbers()
+
+          console.log("\n\nnewSession hook called\n\n")
+
+          // get new prompt
+          getNextPhrase(loggedIn, phraseNumber as number, phrasesPerSession as number)
+
+          setReportCompletedTrainingSession(false)
         }
     )
 
-    // reset metrics
-    resetMetrics()
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reportCompletedTrainingSession]);
 
-  useEffect(() => {
-    // block active api state
-    if (!reportCompletedTrainingSession) return
-
-    // update session and phrase numbers
-    refreshTrainingDataNumbers()
-
-    setNewSession(true)
-
-    setReportCompletedTrainingSession(false)
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reportCompletedTrainingSession]);
-
-  useLayoutEffect(() => {
-    // block not new session state
-    if (!newSession) return
-
-    // get new prompt
-    getNextPhrase(loggedIn, phraseNumber as number, phrasesPerSession as number)
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [newSession]);
+  // useEffect(() => {
+  //   // block not new session state
+  //   if (!newSession) return
+  //
+  //   console.log("\n\nnewSession hook called\n\n")
+  //
+  //   // get new prompt
+  //   getNextPhrase(loggedIn, phraseNumber as number, phrasesPerSession as number)
+  //
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [newSession]);
 
   let target: PickerData | undefined;
 
@@ -397,7 +396,7 @@ function Platform() {
   }
 
   function handleKeydown(e: KeyboardEvent) {
-    e.preventDefault();
+    e.preventDefault()
 
     // listen for enter key
     if (e.key === "Enter") {
@@ -406,14 +405,13 @@ function Platform() {
       // check if chosen sentence matches prompt
       const correctChoice = (target?.value as string) === prompt;
       if (correctChoice) {
-        console.log("correct choice");
-        handleCorrectChoice(loggedIn);
-        removeKeydownListener();
+        console.log("correct choice")
+        handleCorrectChoice(loggedIn)
       } else {
-        console.log("wrong choice");
-        handleIncorrectChoice();
-        removeKeydownListener();
+        console.log("wrong choice")
+        handleIncorrectChoice()
       }
+      removeKeydownListener()
     }
 
     // listen for numeric entry
@@ -572,8 +570,8 @@ function Platform() {
     }
   }
 
+  /** get the next phrase in the training session */
   function getNextPhraseInTraining() {
-
     console.log("Notice: Is logged in, getting next phrase in session")
     return APIgetNextPhraseInSession(
         (response) => {

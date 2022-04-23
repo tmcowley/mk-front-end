@@ -17,8 +17,8 @@ function SignUp() {
           Please sign-up using your current typing speed
           <br />
           <br />
-          Alternatively, <Link to="/sign-in">Sign-in</Link> or{" "}
-          <Link to="/">Return Home</Link>
+          Alternatively, <Link className="link" to="/sign-in">Sign-in</Link> or{" "}
+          <Link className="link" to="/">Return Home</Link>
         </p>
 
         <br />
@@ -93,7 +93,7 @@ function SignUp() {
                   else {
                     console.log("Notice: successful sign-up");
                     setSubmitting(true);
-                    navigate("/", { state: { test: "test" } });
+                    navigate("/display-user-code", { state: { test: "test" } });
                   }
                 },
                 (error) => {

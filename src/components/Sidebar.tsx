@@ -46,6 +46,10 @@ function Sidebar({ pageWrapId, outerContainerId, isLoggedIn }: SidebarProps) {
           <a className="menu-item" href="/sign-out">
             Sign-out
           </a>
+          <br />
+          <a className="menu-item" href="/display-user-code">
+            See Code
+          </a>
         </Menu>
       </div>
     </>
