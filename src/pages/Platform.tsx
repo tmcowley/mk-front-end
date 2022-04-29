@@ -509,6 +509,8 @@ function Platform() {
 
     console.groupCollapsed("updating metrics")
 
+    const promptWordCount = countWords(prompt)
+
     // recalculate wpm (true)
     {
       const msToMinutes = 1 / (Math.pow(10, 3) * 60)
@@ -522,7 +524,7 @@ function Platform() {
       elapsedTimeMinutes = (performance.now() - startTime) * msToMinutes
       console.log("elapsed minutes (updated): " + elapsedTimeMinutes)
 
-      if (correct) correctWordsCount += countWords(prompt)
+      if (correct) correctWordsCount += promptWordCount
 
       console.log("Notice: setting wpmTrue")
       setWpmTrue(correctWordsCount / elapsedTimeMinutes)
@@ -533,9 +535,9 @@ function Platform() {
       let totalWordCountLocal = totalWordCount
       let errorCount = (errorRate / 100) * totalWordCountLocal
 
-      totalWordCountLocal += countWords(prompt)
+      totalWordCountLocal += promptWordCount
 
-      if (!correct) errorCount += countWords(prompt)
+      if (!correct) errorCount += promptWordCount
 
       console.log("Notice: setting error rate")
       setErrorRate((errorCount / totalWordCountLocal) * 100)
@@ -543,11 +545,11 @@ function Platform() {
 
     // recalculate totalWordCount, if correct
     console.log("Notice: setting totalWordCount")
-    if (correct) setTotalWordCount(totalWordCount + countWords(prompt))
+    setTotalWordCount(totalWordCount + promptWordCount)
 
     // recalculate elapsedTime
     console.log("Notice: setting elapsedTime")
-    setElapsedTime(performance.now() - startTime)
+    if (correct) setElapsedTime(performance.now() - startTime)
 
     console.groupEnd()
   }
