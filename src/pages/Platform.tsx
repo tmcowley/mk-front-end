@@ -133,9 +133,9 @@ function Platform() {
     selectInputBox()
 
     // refresh elapsed time every half-second
-    setInterval(() => {
-      setElapsedTime(performance.now() - startTime)
-    }, 500)
+    // setInterval(() => {
+    //   setElapsedTime(performance.now() - startTime)
+    // }, 500)
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -394,7 +394,7 @@ function Platform() {
     const inputDelta = getStringDelta(oldValue, newValue, selectionEnd)
 
     // restrict keyboard sides
-    const restrictRightSide = false
+    const restrictRightSide = true
     const side = rightSide
     const characterOnRight = (element: string) => {
       return side.has(element)
@@ -483,7 +483,7 @@ function Platform() {
       // focus input box
       selectInputBox()
 
-      target = undefined
+      // target = undefined
 
       removeKeydownListener()
     }
@@ -492,7 +492,7 @@ function Platform() {
       // update metrics
       updateAllMetrics(prompt, false)
 
-      target = undefined
+      // target = undefined
     }
   }
 

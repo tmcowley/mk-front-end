@@ -39,7 +39,7 @@ function Sidebar({ pageWrapId, outerContainerId, isLoggedIn }: SidebarProps) {
           outerContainerId={outerContainerId}
           styles={styles}
         >
-          <a className="menu-item" href="/learn">
+          <a className="menu-item" href="/">
             Home
           </a>
           <br />
