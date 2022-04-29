@@ -541,9 +541,9 @@ function Platform() {
       setErrorRate((errorCount / totalWordCountLocal) * 100)
     }
 
-    // recalculate totalWordCount
+    // recalculate totalWordCount, if correct
     console.log("Notice: setting totalWordCount")
-    setTotalWordCount(totalWordCount + countWords(prompt))
+    if (correct) setTotalWordCount(totalWordCount + countWords(prompt))
 
     // recalculate elapsedTime
     console.log("Notice: setting elapsedTime")
