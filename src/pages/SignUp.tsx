@@ -96,7 +96,7 @@ function SignUp() {
                     navigate("/display-user-code", { state: { test: "test" } });
                   }
                 },
-                (error) => {
+                () => {
                   setErrors({ age: "User sign-up failed" });
                   setSubmitting(false);
                 }
@@ -133,6 +133,11 @@ function SignUp() {
               <ErrorMessage name="age" component="div" />
               <ErrorMessage name="speed" component="div" />
 
+              <br />
+
+              By signing-up to our platform you consent to the use of cookies.
+
+              <br />
               <br />
 
               <button type="submit" disabled={isSubmitting}>
