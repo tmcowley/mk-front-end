@@ -1,6 +1,8 @@
-# mirrored-keyboard
+# mk-front-end
 
 Third-Year Project: The predictive mirrored keyboard
+
+Hosted at [mirrored-keyboard.vercel.app/](https://mirrored-keyboard.vercel.app/)
 
 ## About the Project
 
@@ -8,26 +10,25 @@ This project aims to design and implement a typing system suitable for one-hande
 
 Our technique bisects the keyboard into an active and an inactive section: these can be the left and right keyboard
 halves. Each alphabetic character from the inactive half will be symmetrically mapped to the active half, according to
-hand symmetry. 
+hand symmetry.
+
+Predictive methods are used to predict intended inputs. 
 
 ## About This Component
 
 The front-end component, build with React, displays the application user-interface. 
+
+This front-end component acts as our system's web client. It is built with TypeScript and React, and serves to both demonstrate our technique, and provide a platform for technique learning. 
+
 It allows inputs to our keyboard algorithm, these being sentences in half, or full form. 
 This component calls back-end APIs to process sentences, query sentence prompts, and record metrics.
 
 ## Launching the Front-End Component
 
-To build and run: <br />
+To install, build and run locally: <br />
 
 ```
 npm install; npm run build; npm start
-```
-
-To test: <br />
-
-```
-npm test
 ```
 
 ## Front-End Technical Configuration
